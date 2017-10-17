@@ -58,7 +58,7 @@ II. Repository
   - ```getAll()```
   - ```findById(id)``` for Basic Model or ```findById(id1, id2,...)``` for Intermediate Model (number of parameters must equal the number of fields which is annotated with ```@CombineKey``` with the same order
   - ```save(model)```
-  - ```remove(model)```
+  - ```remove(id)``` or remove(id1, id2,...)
   
 ***That's everything you need to do. Not even a single query***
 
