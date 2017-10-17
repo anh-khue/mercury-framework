@@ -40,19 +40,20 @@ I. Model Mapping
       @CombineKey
       private int majorId;
       ```.      
-3. Repository
+II. Repository
 - Best practicing is to put all of your repository in package ```app.repository``` package.
 - Every repository must ```extends``` abstract class ```CrudRepository``` from ```framework.model_mapping.repository.``` package.
 - You must also provide ```model``` as generic class for ```CrudRepository```. For example:
       ```
       public class UserRepository extends CrudRepository<User>
       ```
+      
 **Try the magic**      
 1. Instantiate a repository that you need.
 2. Try the following methods:
   - ```getAll()```
   - ```findById(id)``` for Basic Model or ```findById(id1, id2)``` for Intermediate Model
   - ```save(model)```
-  - ```remove(model```
+  - ```remove(model)```
 ***That's it! You may think that I'm kidding but that is everything you need to do. Not even a single query***
 I'll keep updating this framework so that you can dynamically create your own query easily.  
