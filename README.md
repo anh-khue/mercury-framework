@@ -1,6 +1,8 @@
 # MyFramework
 My Manual Framework for Java Application Development.
 
+**So far, please edit connection to database in ```makeConnection()``` method in ```app.util.DbUtils```. I'll make it easier with XML**
+
 I. Model Mapping
 1. Database
 - So far, this is a "Database First" framework, so Database must be created first.
