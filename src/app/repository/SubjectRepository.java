@@ -1,7 +1,7 @@
 package app.repository;
 
 import app.model.Subject;
-import framework.model_mapping.repository.CrudRepository;
+import framework.repository.CrudRepository;
 
 public class SubjectRepository extends CrudRepository<Subject> {
 }

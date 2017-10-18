@@ -1,4 +1,4 @@
-package framework.model_mapping.annotation.model;
+package framework.annotation.model;
 
 import java.lang.annotation.*;
 

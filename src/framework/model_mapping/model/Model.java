@@ -1,8 +1,8 @@
 package framework.model_mapping.model;
 
-import framework.model_mapping.annotation.model.Column;
-import framework.model_mapping.annotation.processor.ModelAnnotationProcessor;
-import app.util.DbUtils;
+import framework.annotation.model.Column;
+import framework.annotation.processor.ModelAnnotationProcessor;
+import framework.util.DbUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -24,7 +24,7 @@ public abstract class Model implements Serializable {
         return id;
     }
 
-    protected Model manyToOne(String methodName) {
+    protected Model manyToOne() {
         Model entity = null;
 
         Connection connection = null;
@@ -32,6 +32,8 @@ public abstract class Model implements Serializable {
         ResultSet resultSet = null;
 
         try {
+            String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
+
             String tableName = modelAnnotationProcessor.getTableName();
 
             Method method = this.getClass().getDeclaredMethod(methodName);
@@ -61,7 +63,7 @@ public abstract class Model implements Serializable {
         return entity;
     }
 
-    protected List<? extends Model> oneToMany(String methodName) {
+    protected List<? extends Model> oneToMany() {
         List<Model> entityList = null;
 
         Connection connection = null;
@@ -69,6 +71,8 @@ public abstract class Model implements Serializable {
         ResultSet resultSet = null;
 
         try {
+            String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
+
             String tableName = modelAnnotationProcessor.getTableName();
 
             Method method = this.getClass().getDeclaredMethod(methodName);

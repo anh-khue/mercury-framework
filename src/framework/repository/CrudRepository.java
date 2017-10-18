@@ -1,9 +1,9 @@
-package framework.model_mapping.repository;
+package framework.repository;
 
-import framework.model_mapping.annotation.model.Column;
-import framework.model_mapping.annotation.processor.ModelAnnotationProcessor;
+import framework.annotation.model.Column;
+import framework.annotation.processor.ModelAnnotationProcessor;
 import framework.model_mapping.model.Model;
-import app.util.DbUtils;
+import framework.util.DbUtils;
 import framework.model_mapping.model.ModelUtils;
 
 import java.lang.reflect.Field;

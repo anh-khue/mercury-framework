@@ -1,9 +1,9 @@
 package app.model;
 
-import framework.model_mapping.annotation.model.Column;
-import framework.model_mapping.annotation.model.CombineKey;
-import framework.model_mapping.annotation.model.ManyToOne;
-import framework.model_mapping.annotation.model.Table;
+import framework.annotation.model.Column;
+import framework.annotation.model.CombineKey;
+import framework.annotation.model.ManyToOne;
+import framework.annotation.model.Table;
 import framework.model_mapping.model.Model;
 
 @Table(tableName = "lecturer_teach_subject")
@@ -23,7 +23,7 @@ public class LecturerTeachSubject extends Model {
 
     @ManyToOne(column = "lecturer_id", referencedTable = "lecturer")
     public Lecturer getLecturer() {
-        return lecturer == null ? (Lecturer) manyToOne("getLecturer") : lecturer;
+        return lecturer == null ? (Lecturer) manyToOne() : lecturer;
     }
 
     public void setLecturer(Lecturer lecturer) {
@@ -33,7 +33,7 @@ public class LecturerTeachSubject extends Model {
 
     @ManyToOne(column = "subject_id", referencedTable = "subject")
     public Subject getSubject() {
-        return subject == null ? (Subject) manyToOne("getSubject") : subject;
+        return subject == null ? (Subject) manyToOne() : subject;
     }
 
     public void setSubject(Subject subject) {

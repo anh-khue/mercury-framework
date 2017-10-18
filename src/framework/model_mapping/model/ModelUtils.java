@@ -1,7 +1,6 @@
 package framework.model_mapping.model;
 
-import framework.model_mapping.annotation.model.Column;
-import framework.model_mapping.model.Model;
+import framework.annotation.model.Column;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;

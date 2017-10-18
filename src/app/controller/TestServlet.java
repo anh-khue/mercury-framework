@@ -2,6 +2,7 @@ package app.controller;
 
 import app.model.Lecturer;
 import app.repository.LecturerRepository;
+import app.repository.SessionRepository;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,10 +19,10 @@ public class TestServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LecturerRepository lecturerRepository = new LecturerRepository();
+        SessionRepository sessionRepository = new SessionRepository();
         try {
-            Lecturer lecturer = lecturerRepository.findById(1);
-            System.out.println(lecturer.getLastName());
+            sessionRepository.findById(1).getLearnerList().forEach(
+                    learner -> System.out.println(learner.getFirstName() + " " + learner.getLastName()));
         } catch (SQLException e) {
             e.printStackTrace();
         }

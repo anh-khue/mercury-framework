@@ -1,8 +1,8 @@
 package app.model;
 
-import framework.model_mapping.annotation.model.Column;
-import framework.model_mapping.annotation.model.ManyToOne;
-import framework.model_mapping.annotation.model.Table;
+import framework.annotation.model.Column;
+import framework.annotation.model.ManyToOne;
+import framework.annotation.model.Table;
 import framework.model_mapping.model.Model;
 
 import java.sql.Timestamp;
@@ -50,7 +50,7 @@ public class Learner extends Model {
 
     @ManyToOne(referencedTable = "session", column = "session_id")
     public Session getSession() {
-        return this.session == null ? (Session) this.manyToOne("getSession") : session;
+        return this.session == null ? (Session) this.manyToOne() : session;
     }
 
     public void setSession(Session session) {

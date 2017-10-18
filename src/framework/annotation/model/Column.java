@@ -1,9 +1,9 @@
-package framework.model_mapping.annotation.model;
+package framework.annotation.model;
 
 import java.lang.annotation.*;
 
-@Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CombineKey {
+public @interface Column {
+    String value() default "";
 }

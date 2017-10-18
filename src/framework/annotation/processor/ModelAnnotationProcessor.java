@@ -1,6 +1,6 @@
-package framework.model_mapping.annotation.processor;
+package framework.annotation.processor;
 
-import framework.model_mapping.annotation.model.*;
+import framework.annotation.model.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;

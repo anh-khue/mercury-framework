@@ -1,15 +1,19 @@
-package app.util;
+package framework.util;
+
+import framework.config.ConnectionConfig;
+import framework.config.ConnectionInfor;
 
 import java.io.Serializable;
 import java.sql.*;
 
 public class DbUtils implements Serializable {
     public static Connection makeConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        ConnectionInfor connectionInfor = ConnectionConfig.getConnectionInfor();
+        Class.forName(connectionInfor.getDriverClass());
         return DriverManager.getConnection(
-                "jdbc:sqlserver://localhost:1433;databaseName=bmag_db;instanceName=SQL16ENTERPRISE",
-                "sa",
-                "123456"
+                connectionInfor.getUrl(),
+                connectionInfor.getUsername(),
+                connectionInfor.getPassword()
         );
     }
 
