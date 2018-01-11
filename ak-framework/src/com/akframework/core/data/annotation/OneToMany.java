@@ -1,4 +1,4 @@
-package com.akframework.data.annotation;
+package com.akframework.core.data.annotation;
 
 import java.lang.annotation.*;
 
@@ -8,5 +8,5 @@ import java.lang.annotation.*;
 public @interface OneToMany {
     String table() default "";
 
-    String column() default "";
+    String referenceColumn() default "";
 }

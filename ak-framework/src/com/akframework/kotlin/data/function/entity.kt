@@ -1,32 +1,34 @@
 @file:JvmName("EntityFunctions")
 
-package com.akframework
+package com.akframework.kotlin.data.function
 
-import com.akframework.data.annotation.Column
-import com.akframework.data.mapping.Entity
+import com.akframework.core.data.annotation.Column
+import com.akframework.core.data.annotation.ManyToOne
+import com.akframework.core.data.annotation.OneToMany
+import com.akframework.core.data.common.Entity
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.util.*
 
-
 fun getFields(model: Class<*>): List<Field> {
-    val entityFields = ArrayList<Field>()
-
+    val fieldList = ArrayList<Field>()
+    
     if (model.superclass != null) {
-        entityFields.addAll(getFields(model.superclass))
+        fieldList.addAll(getFields(model.superclass))
     }
-
-    val fields = model.declaredFields
-    entityFields.addAll(Arrays.asList(*fields))
-
-    return entityFields
+    
+    val modelFieldArray = model.declaredFields
+    fieldList.addAll(Arrays.asList(*modelFieldArray))
+    
+    return fieldList
 }
 
 @Throws(SQLException::class, IllegalAccessException::class)
-fun setFields(entity: Entity, fields: List<Field>, resultSet: ResultSet) {
-    for (field in fields) {
+fun setFields(entity: Entity, fieldList: List<Field>, resultSet: ResultSet) {
+    for (field in fieldList) {
         val column = field.getAnnotation(Column::class.java)
         if (column != null) {
             field.isAccessible = true
@@ -34,8 +36,6 @@ fun setFields(entity: Entity, fields: List<Field>, resultSet: ResultSet) {
             val fieldType = field.type
             value = if (fieldType == Int::class.javaPrimitiveType || fieldType == Int::class.java) {
                 resultSet.getInt(column.value)
-            } else if (fieldType == String::class.java) {
-                resultSet.getString(column.value)
             } else if (fieldType == Boolean::class.javaPrimitiveType || fieldType == Boolean::class.java) {
                 resultSet.getBoolean(column.value)
             } else if (fieldType == Timestamp::class.java) {
@@ -45,8 +45,30 @@ fun setFields(entity: Entity, fields: List<Field>, resultSet: ResultSet) {
             } else {
                 resultSet.getString(column.value)
             }
-
+            
             field.set(entity, value)
         }
     }
+}
+
+fun getManyToOneMap(method: Method): Map<String, String> {
+    val map = HashMap<String, String>()
+    
+    val annotation = method.getAnnotation(ManyToOne::class.java)
+    
+    map.put("referencedTable", annotation.referencedTable)
+    map.put("column", annotation.column)
+    
+    return map
+}
+
+fun getOneToManyMap(method: Method): Map<String, String> {
+    val map = HashMap<String, String>()
+    
+    val annotation = method.getAnnotation(OneToMany::class.java)
+    
+    map.put("table", annotation.table)
+    map.put("referenceColumn", annotation.referenceColumn)
+    
+    return map
 }
