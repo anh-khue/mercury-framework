@@ -1,65 +1,61 @@
-# MyFramework
-My Manual Framework for Java Application Development.
+# AK Framework
+AK Framework for Java Application Development - created due to too much of free time.
 
-**Database connection is now much easier. Just go edit your neccessary information in ```config.xml``` file in ```appp```**
+**Configuration for connecting to Database is required to be suppplied at ```connection.xml``` file in ```resources```**
 
-I. Model Mapping
+I. Data Mapping
 1. Database
-- So far, this is a "Database First" framework, so Database must be created first.
-- **Every*** table must have an "id" column and this must be auto incremental, even in intermediate tables.
-- This "id" field is not neccessary to be the primary key (however it should be, except for intermediate tables in many-to-many relationships).
-- Try to avoid giving your tables or columns duplicated name with keywords in SQL.
-2. Model
-- Best practicing is to put all of your models in package ```app.model``` package.
-- Every models must ```extends``` abstract class ```Model``` from ```framework.model_mapping.model.``` package.
-- Annotation ```@Table``` must be placed before declaring your ```public class```. For example:
-      ```
-      @Table(tableName="user")
-      public class User extends Model
-      ```. Please notice that ```tableName``` must match your table's name on the Database.
-- Annotation ```@Column``` must be placed before declaring your field in case that field represents a column in your table. For example:
-      ```
-      @Column("first_name")
-      private String firstName;
-      ```. Please notice that value inside ```@Column``` must match your column's name on the Database.
-- **DO NOT** declare the "id" field in ```model```      
-- ***UPDATE*** Annotation ```@ManyToOne``` must be placed before declaring your ```getter``` in case that returns another ```model``` through one-to-many relationship. This getter must return ~~~```getManyToOne("methodName"~~)```~~~ ```manyToOne()```. For example:
-      ```
-      @ManyToOne(referencedTable = "role", column = "role_id")
-      public Role getRole() {
-        return this.manyToOne();
-      }
-      ```. Please notice that ```referencedTable``` must match the table's name where ```column``` is referenced to.
- - ***UPDATED*** Annotation ```@OneToMany``` must be placed before declaring your ```getter``` in case that returns  ```List<model>``` through one-to-many relationship. This getter must return ~~~```getOneToMany("methodName")```~~~ ```oneToMany()```. For example:
-       ```
-       @OneToMany(table = "user", column = "role_id")
-       public List<User> getUserList() {
-         return this.oneToMany();
-       }
-      ```. Please notice that ```table``` must match the table's name where its ```column``` is referencing to this table'id.
- - Annotation ```@CombineKey```  must be placed before declaring your field in case that field represents a column in your intermediate table in many-to-many relationship. For example:
-       ```
-       @Column("major_id")
-       @CombineKey
-       private int majorId;
-       ```.       
+- Database must be already created.
+- Every table must have an "id" column. ID is required be auto incremental, even in intermediate tables.
+- Avoid naming tables or columns with keywords in SQL.
+2. Data - Entity
+- Every Entity/DTO must ```extends``` abstract class ```com.akframework.core.data.common.Entity```.
+- **DO NOT** declare the "id" field in your Entity.
+- Annotation ```@Table``` must be placed before declaring your Entity and ```table``` must match your table's name on the Database. For example:
+```
+@Table(table="user")
+public class User extends Model
+```
+- Annotation ```@Column``` must be placed before declaring your field (in case that field represents a column in your table). 
+- Value inside ```@Column``` must match your column's name on the Database. For example:
+```
+@Column("first_name")
+private String firstName;
+```
+- Annotation ```@ManyToOne``` must be placed before declaring your ```getter``` if it returns another Entity through one-to-many relationship. ```referencedTable``` must match the table's name where ```column``` is referenced to. This getter must also return ```manyToOne()``` method. For example:
+```
+@ManyToOne(referencedTable = "role", column = "role_id")
+public Role getRole() {
+      return this.manyToOne();
+}
+```
+- Annotation ```@OneToMany``` must be placed before declaring your ```getter``` if it returns a Collection of Entities through one-to-many relationship. ```table``` must match the table's name where its ```referenceColumn``` is referencing to this table'id. This getter must also return ```oneToMany()``` method. For example:
+```
+@OneToMany(table = "user", referenceColumn = "role_id")
+public List<User> getUserList() {
+      return this.oneToMany();
+}
+```
+- Annotation ```@CombineKey```  must be placed before declaring your field in case that field represents a column in your intermediate table in many-to-many relationship. For example:
+```
+@Column("major_id")
+@CombineKey
+private int majorId;
+```
+
+II. Repository
+- Every repository must ```extends``` abstract class ```com.akframework.core.repository.CrudRepository```.
+- An Entity must be provided as generic class for ```CrudRepository<Entity>```. For example:
+```
+public class UserRepository extends CrudRepository<User> {}
+```
        
- II. Repository
- - Best practicing is to put all of your repository in package ```app.repository``` package.
- - Every repository must ```extends``` abstract class ```CrudRepository``` from ```framework.model_mapping.repository.``` package.
- - You must also provide ```model``` as generic class for ```CrudRepository```. For example:
-       ```
-      public class UserRepository extends CrudRepository<User>
-       ```
-       
- **Try the magic**      
+ **Give it a try**      
  1. Instantiate a repository that you need.
  2. Try the following methods:
-   - ```getAll()```
-   - ```findById(id)``` for Basic Model or ```findById(id1, id2,...)``` for Intermediate Model (number of parameters must equal the number of fields which is annotated with ```@CombineKey``` with the same order
+   - ```findAll()```
+   - ```findById(id)``` for Basic Entity or ```findById(id1, id2,...)``` for Intermediate Model (number of parameters must equal the number of fields which is annotated with ```@CombineKey```, respectively.
    - ```save(model)```
    - ```remove(id)``` or ```remove(id1, id2,...)```
    
- ***That's everything you need to do. Not even a single query***
- 
- I'll keep updating this framework so that you can dynamically create your own query easily.  
+ ***Re-constructing packages and fixing bugs on Query Builder feature for handling complex queries***
