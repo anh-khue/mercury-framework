@@ -1,4 +1,7 @@
 # AK Framework
+
+*Project is under re-construction on branch re-structure for cleaner and better packages hierachy.*
+
 AK Framework for Java Application Development - created due to too much of free time.
 
 **Configuration for connecting to Database is required to be suppplied at ```connection.xml``` file in ```resources```**
