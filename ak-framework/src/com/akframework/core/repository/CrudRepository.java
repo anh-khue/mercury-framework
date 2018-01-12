@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.akframework.core.connection.ConnectionManager.*;
@@ -65,47 +66,57 @@ public abstract class CrudRepository<T extends Entity> implements DataRepository
         return result;
     }
 
-    public T findById(int... id) throws SQLException {
-        T entity = null;
+    public Optional<T> findById(int... id) {
+        Optional<T> entity = Optional.empty();
 
-        String query;
+//        String query;
+//        if (id.length > 1) {
+//            List<String> modelCombineKeys = processor.getCombineKey();
+//            StringBuilder combineKey = new StringBuilder("");
+//            combineKey.append(modelCombineKeys.stream()
+//                    .map(key -> key + " = ?")
+//                    .collect(Collectors.joining(" AND ")));
+//
+//            query = "SELECT * FROM " + table + " WHERE " + combineKey;
+//        } else {
+//            query = "SELECT * FROM " + table + " WHERE id = ?";
+//        }
+
+        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + table + " WHERE ");
         if (id.length > 1) {
             List<String> modelCombineKeys = processor.getCombineKey();
-            StringBuilder combineKey = new StringBuilder("");
-            combineKey.append(modelCombineKeys.stream()
+            queryBuilder.append(modelCombineKeys.stream()
                     .map(key -> key + " = ?")
                     .collect(Collectors.joining(" AND ")));
-
-            query = "SELECT * FROM " + table + " WHERE " + combineKey;
         } else {
-            query = "SELECT * FROM " + table + " WHERE id = ?";
+            queryBuilder.append("id = ?");
         }
 
-        ResultSet resultSet = null;
 
         try (Connection connection = openConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(queryBuilder.toString())) {
             for (int i = 0; i < id.length; i++) {
                 statement.setInt((i + 1), id[i]);
             }
 
-            resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                entity = entityClass.newInstance();
-                EntityFunctions.setFields(entity, fields, resultSet);
+                T foundEntity = entityClass.newInstance();
+                EntityFunctions.setFields(foundEntity, fields, resultSet);
+                entity = Optional.of(foundEntity);
             }
+
+            resultSet.close();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) resultSet.close();
         }
 
         return entity;
     }
 
-    public void save(T entity) throws SQLException {
-        String query = findById(entity.getId()) != null ? update(entity) : insert();
+    public void save(T entity) {
+        String query = findById(entity.getId()).isPresent() ? update(entity) : insert();
 
         try (Connection connection = openConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -126,24 +137,29 @@ public abstract class CrudRepository<T extends Entity> implements DataRepository
         }
     }
 
-    public void remove(int... id) throws SQLException {
-        if (findById(id) == null) {
+    public void remove(int... id) {
+//        if (findById(id) == null) {
+//            System.out.println("No entity found!");
+//            return;
+//        }
+
+        if (!findById(id).isPresent()) {
             System.out.println("No entity found!");
             return;
         }
 
-        StringBuilder query = new StringBuilder("DELETE FROM " + table + " WHERE ");
+        StringBuilder queryBuilder = new StringBuilder("DELETE FROM " + table + " WHERE ");
         if (id.length > 1) {
             List<String> entityCombineKeys = processor.getCombineKey();
-            query.append(entityCombineKeys.stream()
+            queryBuilder.append(entityCombineKeys.stream()
                     .map(key -> key + " = ?")
                     .collect(Collectors.joining(" AND ")));
         } else {
-            query.append("id = ?");
+            queryBuilder.append("id = ?");
         }
 
         try (Connection connection = openConnection();
-             PreparedStatement statement = connection.prepareStatement(query.toString())) {
+             PreparedStatement statement = connection.prepareStatement(queryBuilder.toString())) {
 
             for (int i = 0; i < id.length; i++) {
                 statement.setInt((i + 1), id[i]);
