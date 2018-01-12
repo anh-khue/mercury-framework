@@ -25,7 +25,6 @@ public class DataAnnotationProcessor implements Serializable {
     public List<String> getCombineKey() {
         Field[] fields = entityClass.getDeclaredFields();
 
-
         //        for (Field field : fields) {
 //            CombineKey combineKey = field.getAnnotation(CombineKey.class);
 //            Column tableColumn = field.getAnnotation(Column.class);
