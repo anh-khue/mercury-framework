@@ -1,17 +1,20 @@
-package com.app.test;
+package test.akframework.core.connection;
 
 import com.akframework.core.connection.ConnectionManager;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class FrameworkTestApp {
+public class ConnectionManagerTest {
 
-    public static void main(String[] args) {
+    @Test
+    public void openConnection() {
         try {
             Connection connection = ConnectionManager.openConnection();
-            String message = connection != null ? "Success" : "Ahihi do ngoc";
-            System.out.println(message);
+
+            Assert.assertNotNull(connection);
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }

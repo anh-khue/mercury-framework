@@ -49,7 +49,6 @@ public abstract class CrudRepository<T extends Entity> implements DataRepository
 
         String query = "SELECT * FROM " + table;
 
-
         try (Connection connection = openConnection();
              PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
@@ -68,19 +67,6 @@ public abstract class CrudRepository<T extends Entity> implements DataRepository
 
     public Optional<T> findById(int... id) {
         Optional<T> entity = Optional.empty();
-
-//        String query;
-//        if (id.length > 1) {
-//            List<String> modelCombineKeys = processor.getCombineKey();
-//            StringBuilder combineKey = new StringBuilder("");
-//            combineKey.append(modelCombineKeys.stream()
-//                    .map(key -> key + " = ?")
-//                    .collect(Collectors.joining(" AND ")));
-//
-//            query = "SELECT * FROM " + table + " WHERE " + combineKey;
-//        } else {
-//            query = "SELECT * FROM " + table + " WHERE id = ?";
-//        }
 
         StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + table + " WHERE ");
         if (id.length > 1) {
@@ -115,7 +101,7 @@ public abstract class CrudRepository<T extends Entity> implements DataRepository
         return entity;
     }
 
-    public void save(T entity) {
+    public void save(Entity entity) {
         String query = findById(entity.getId()).isPresent() ? update(entity) : insert();
 
         try (Connection connection = openConnection();
@@ -125,7 +111,11 @@ public abstract class CrudRepository<T extends Entity> implements DataRepository
                 Column column = fields.get(i).getAnnotation(Column.class);
                 if (column != null) {
                     fields.get(i).setAccessible(true);
-                    statement.setString(i + 1, String.valueOf(fields.get(i).get(entity)));
+                    Object value = fields.get(i).get(entity);
+
+                    statement.setString(
+                            i,
+                            value == null ? null : String.valueOf(value));
                 }
             }
 
@@ -173,7 +163,7 @@ public abstract class CrudRepository<T extends Entity> implements DataRepository
         }
     }
 
-    private String update(T entity) {
+    private String update(Entity entity) {
         StringBuilder valuesTuple = new StringBuilder("");
         valuesTuple.append(
                 columns.subList(1, columns.size())

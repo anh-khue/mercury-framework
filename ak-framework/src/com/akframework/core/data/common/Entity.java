@@ -18,8 +18,6 @@ import static com.akframework.core.connection.ConnectionManager.*;
 
 public abstract class Entity implements Serializable {
 
-    private DataAnnotationProcessor processor = new DataAnnotationProcessor(this.getClass());
-
     @Column(value = "id")
     private int id;
 
@@ -28,6 +26,8 @@ public abstract class Entity implements Serializable {
     }
 
     protected Entity manyToOne() throws SQLException {
+        DataAnnotationProcessor processor = EntityFunctions.getDataAnnotationProcessor(this.getClass());
+
         Entity entity = null;
 
         String tableName = processor.getTable();
@@ -68,6 +68,8 @@ public abstract class Entity implements Serializable {
     }
 
     protected List<? extends Entity> oneToMany() throws SQLException {
+        DataAnnotationProcessor processor = EntityFunctions.getDataAnnotationProcessor(this.getClass());
+
         List<Entity> entityList = null;
 
         String table = processor.getTable();
