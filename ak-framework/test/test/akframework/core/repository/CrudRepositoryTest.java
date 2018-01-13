@@ -1,5 +1,6 @@
 package test.akframework.core.repository;
 
+import org.junit.Assert;
 import org.junit.Test;
 import test.akframework.app.Drink;
 import test.akframework.app.DrinkRepository;
@@ -66,25 +67,66 @@ public class CrudRepositoryTest {
 //        Save for Insert new Entity
         DrinkRepository drinkRepository = new DrinkRepository();
 
-        Drink drink = new Drink();
-        drink.setDrinkName("Matcha");
-        drink.setPrice(33);
-        System.out.println(drink);
-        drinkRepository.save(drink);
+        Drink drinkInsert = new Drink();
+        drinkInsert.setDrinkName("Matcha");
+        drinkInsert.setPrice(33);
+        System.out.println(drinkInsert);
+        drinkRepository.save(drinkInsert);
 
         List<Drink> listAfterInsert = drinkRepository.findAll();
         int lastIndex = listAfterInsert.size() - 1;
         Drink result = listAfterInsert.get(lastIndex);
         System.out.println(result);
 
-        assertEquals(drink.getDrinkName(), result.getDrinkName());
-        assertEquals(0, Double.compare(drink.getPrice(), result.getPrice()));
-        assertEquals(drink.getDeletedDate(), result.getDeletedDate());
+        assertEquals(drinkInsert.getDrinkName(), result.getDrinkName());
+        assertEquals(0, Double.compare(drinkInsert.getPrice(), result.getPrice()));
+        assertEquals(drinkInsert.getDeletedDate(), result.getDeletedDate());
+
+
+//        Save for Update Entity
+        Optional<Drink> beforeUpdate = drinkRepository.findById(1);
+
+        beforeUpdate.ifPresent(before -> {
+            before.setDrinkName("Vietnamese Black Coffee");
+            before.setPrice(19);
+            System.out.println(before);
+            drinkRepository.save(before);
+
+            Optional<Drink> afterUpdate = drinkRepository.findById(1);
+
+            afterUpdate.ifPresent(after -> {
+                System.out.println(after);
+                assertEquals(before.getDrinkName(), after.getDrinkName());
+                assertEquals(0, Double.compare(before.getPrice(), after.getPrice()));
+                assertEquals(before.getCreatedDate(), after.getCreatedDate());
+                assertEquals(before.getDeletedDate(), after.getDeletedDate());
+            });
+        });
     }
 
     @Test
     public void remove() {
+        DrinkRepository drinkRepository = new DrinkRepository();
 
+        Drink drinkInsert = new Drink();
+        drinkInsert.setDrinkName("Chocolate");
+        drinkInsert.setPrice(35);
+        System.out.println(drinkInsert);
+        drinkRepository.save(drinkInsert);
+
+        List<Drink> listAfterInsert = drinkRepository.findAll();
+        Drink afterInsert = listAfterInsert.get(listAfterInsert.size() - 1);
+        System.out.println(afterInsert);
+
+        assertEquals(drinkInsert.getDrinkName(), afterInsert.getDrinkName());
+        assertEquals(0, Double.compare(drinkInsert.getPrice(), afterInsert.getPrice()));
+        assertEquals(drinkInsert.getDeletedDate(), afterInsert.getDeletedDate());
+
+        drinkRepository.remove(afterInsert.getId());
+
+        List<Drink> listAfterDelete = drinkRepository.findAll();
+        assertNotEquals(listAfterInsert.size(), listAfterDelete.size());
+        assertFalse(drinkRepository.findById(afterInsert.getId()).isPresent());
     }
 }
 
