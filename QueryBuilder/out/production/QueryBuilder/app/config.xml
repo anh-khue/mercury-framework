@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Connections>
+    <Connection>
+        <dbms>MySQL</dbms>
+        <driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>
+        <url>jdbc:sqlserver://localhost:1433;databaseName=bmag_db;instanceName=SQL16ENTERPRISE</url>
+        <username>sa</username>
+        <password>123456</password>
+    </Connection>
+</Connections>
