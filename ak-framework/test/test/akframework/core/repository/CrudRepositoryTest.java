@@ -1,9 +1,8 @@
 package test.akframework.core.repository;
 
-import org.junit.Assert;
 import org.junit.Test;
-import test.akframework.app.Drink;
-import test.akframework.app.DrinkRepository;
+import test.akframework.app.entity.Drink;
+import test.akframework.app.repository.DrinkRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -82,6 +81,7 @@ public class CrudRepositoryTest {
         assertEquals(0, Double.compare(drinkInsert.getPrice(), result.getPrice()));
         assertEquals(drinkInsert.getDeletedDate(), result.getDeletedDate());
 
+        drinkRepository.remove(result.getId());
 
 //        Save for Update Entity
         Optional<Drink> beforeUpdate = drinkRepository.findById(1);
@@ -101,6 +101,15 @@ public class CrudRepositoryTest {
                 assertEquals(before.getCreatedDate(), after.getCreatedDate());
                 assertEquals(before.getDeletedDate(), after.getDeletedDate());
             });
+        });
+
+        Optional<Drink> revertUpdate = drinkRepository.findById(1);
+
+        revertUpdate.ifPresent(revert -> {
+            revert.setDrinkName("Black Coffee");
+            revert.setPrice(18);
+            System.out.println(revert);
+            drinkRepository.save(revert);
         });
     }
 

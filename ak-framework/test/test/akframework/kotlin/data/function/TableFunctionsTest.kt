@@ -3,7 +3,7 @@ package test.akframework.kotlin.data.function
 import com.akframework.kotlin.data.function.getColumns
 import org.junit.Assert.*
 import org.junit.Test
-import test.akframework.app.Drink
+import test.akframework.app.entity.Drink
 import java.util.*
 
 class TableFunctionsTest {

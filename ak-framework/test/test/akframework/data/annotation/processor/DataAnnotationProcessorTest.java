@@ -2,7 +2,7 @@ package test.akframework.data.annotation.processor;
 
 import com.akframework.core.data.annotation.Table;
 import org.junit.Test;
-import test.akframework.app.Drink;
+import test.akframework.app.entity.Drink;
 
 import static org.junit.Assert.*;
 

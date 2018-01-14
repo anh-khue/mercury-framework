@@ -1,10 +1,12 @@
-package test.akframework.app;
+package test.akframework.app.entity;
 
 import com.akframework.core.data.annotation.Column;
+import com.akframework.core.data.annotation.OneToMany;
 import com.akframework.core.data.annotation.Table;
 import com.akframework.core.data.common.Entity;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Table(table = "drinks")
 public class Drink extends Entity {
@@ -20,6 +22,11 @@ public class Drink extends Entity {
 
     @Column("deleted_date")
     private Timestamp deletedDate;
+
+    private List<DrinkHasMaterial> materialList;
+
+    public Drink() {
+    }
 
     public String getDrinkName() {
         return drinkName;
@@ -41,10 +48,6 @@ public class Drink extends Entity {
         return createdDate;
     }
 
-    public void setCreatedDate(Timestamp createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public Timestamp getDeletedDate() {
         return deletedDate;
     }
@@ -60,5 +63,10 @@ public class Drink extends Entity {
                 + ", Price: " + getPrice()
                 + ", Created date: " + getCreatedDate()
                 + ", Deleted date: " + getDeletedDate();
+    }
+
+    @OneToMany(table = "drink_has_material", referenceColumn = "drink_id")
+    public List<DrinkHasMaterial> getMaterialList() {
+        return (List<DrinkHasMaterial>) oneToMany();
     }
 }

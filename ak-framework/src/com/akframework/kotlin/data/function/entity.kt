@@ -14,13 +14,13 @@ import java.sql.SQLException
 import java.sql.Timestamp
 import java.util.*
 
-fun getDataAnnotationProcessor(entityClass: Class<*>): DataAnnotationProcessor = DataAnnotationProcessor(entityClass)
+fun createProcessor(entityClass: Class<*>): DataAnnotationProcessor = DataAnnotationProcessor(entityClass)
 
-fun getFields(model: Class<*>): List<Field> {
+fun loadFields(model: Class<*>): List<Field> {
     val fieldList = ArrayList<Field>()
     
     if (model.superclass != null) {
-        fieldList.addAll(getFields(model.superclass))
+        fieldList.addAll(loadFields(model.superclass))
     }
     
     val modelFieldArray = model.declaredFields
@@ -58,7 +58,7 @@ fun setFields(entity: Entity, fieldList: List<Field>, resultSet: ResultSet) {
     }
 }
 
-fun getManyToOneMap(method: Method): Map<String, String> {
+fun scanManyToOne(method: Method): Map<String, String> {
     val map = HashMap<String, String>()
     
     val annotation = method.getAnnotation(ManyToOne::class.java)
@@ -69,7 +69,7 @@ fun getManyToOneMap(method: Method): Map<String, String> {
     return map
 }
 
-fun getOneToManyMap(method: Method): Map<String, String> {
+fun scanOneToMany(method: Method): Map<String, String> {
     val map = HashMap<String, String>()
     
     val annotation = method.getAnnotation(OneToMany::class.java)
