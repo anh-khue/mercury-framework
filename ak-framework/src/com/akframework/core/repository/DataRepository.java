@@ -1,15 +1,17 @@
 package com.akframework.core.repository;
 
+import com.akframework.core.data.common.Entity;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface DataRepository<T> extends Repository {
+public interface DataRepository<T extends Entity> extends Repository {
 
-    public List<T> findAll();
+    List<T> findAll();
 
-    public Optional<T> findById(int... id);
+    Optional<T> findById(int... id);
 
-    public void save(T t);
+    void save(T entity);
 
-    public void remove(int... id);
+    void remove(int... id);
 }

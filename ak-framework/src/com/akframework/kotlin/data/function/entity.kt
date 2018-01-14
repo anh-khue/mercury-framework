@@ -5,6 +5,7 @@ package com.akframework.kotlin.data.function
 import com.akframework.core.data.annotation.Column
 import com.akframework.core.data.annotation.ManyToOne
 import com.akframework.core.data.annotation.OneToMany
+import com.akframework.core.data.annotation.processor.DataAnnotationProcessor
 import com.akframework.core.data.common.Entity
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -13,11 +14,13 @@ import java.sql.SQLException
 import java.sql.Timestamp
 import java.util.*
 
-fun getFields(model: Class<*>): List<Field> {
+fun createProcessor(entityClass: Class<*>): DataAnnotationProcessor = DataAnnotationProcessor(entityClass)
+
+fun loadFields(model: Class<*>): List<Field> {
     val fieldList = ArrayList<Field>()
     
     if (model.superclass != null) {
-        fieldList.addAll(getFields(model.superclass))
+        fieldList.addAll(loadFields(model.superclass))
     }
     
     val modelFieldArray = model.declaredFields
@@ -32,18 +35,22 @@ fun setFields(entity: Entity, fieldList: List<Field>, resultSet: ResultSet) {
         val column = field.getAnnotation(Column::class.java)
         if (column != null) {
             field.isAccessible = true
-            val value: Any
+            val value: Any?
             val fieldType = field.type
-            value = if (fieldType == Int::class.javaPrimitiveType || fieldType == Int::class.java) {
-                resultSet.getInt(column.value)
-            } else if (fieldType == Boolean::class.javaPrimitiveType || fieldType == Boolean::class.java) {
-                resultSet.getBoolean(column.value)
-            } else if (fieldType == Timestamp::class.java) {
-                resultSet.getTimestamp(column.value)
-            } else if (fieldType == Double::class.javaPrimitiveType || fieldType == Double::class.java) {
-                resultSet.getDouble(column.value)
-            } else {
-                resultSet.getString(column.value)
+            value = try {
+                if (fieldType == Int::class.javaPrimitiveType || fieldType == Int::class.java) {
+                    resultSet.getInt(column.value)
+                } else if (fieldType == Boolean::class.javaPrimitiveType || fieldType == Boolean::class.java) {
+                    resultSet.getBoolean(column.value)
+                } else if (fieldType == Timestamp::class.java) {
+                    resultSet.getTimestamp(column.value)
+                } else if (fieldType == Double::class.javaPrimitiveType || fieldType == Double::class.java) {
+                    resultSet.getDouble(column.value)
+                } else {
+                    resultSet.getString(column.value)
+                }
+            } catch (e: Exception) {
+                null
             }
             
             field.set(entity, value)
@@ -51,7 +58,7 @@ fun setFields(entity: Entity, fieldList: List<Field>, resultSet: ResultSet) {
     }
 }
 
-fun getManyToOneMap(method: Method): Map<String, String> {
+fun scanManyToOne(method: Method): Map<String, String> {
     val map = HashMap<String, String>()
     
     val annotation = method.getAnnotation(ManyToOne::class.java)
@@ -62,7 +69,7 @@ fun getManyToOneMap(method: Method): Map<String, String> {
     return map
 }
 
-fun getOneToManyMap(method: Method): Map<String, String> {
+fun scanOneToMany(method: Method): Map<String, String> {
     val map = HashMap<String, String>()
     
     val annotation = method.getAnnotation(OneToMany::class.java)

@@ -5,20 +5,16 @@ import com.akframework.core.data.annotation.processor.DataAnnotationProcessor;
 import com.akframework.kotlin.data.function.EntityFunctions;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.akframework.core.connection.ConnectionManager.*;
 
 public abstract class Entity implements Serializable {
-
-    private DataAnnotationProcessor processor = new DataAnnotationProcessor(this.getClass());
 
     @Column(value = "id")
     private int id;
@@ -27,89 +23,92 @@ public abstract class Entity implements Serializable {
         return id;
     }
 
-    protected Entity manyToOne() throws SQLException {
-        Entity entity = null;
+    protected Optional<? extends Entity> manyToOne() {
 
-        String tableName = processor.getTable();
+        Optional<Entity> entity = Optional.empty();
 
-        String query = "SELECT * " +
-                "FROM ? " +
-                "WHERE id = (SELECT ? FROM " + tableName + " WHERE id = ?)";
-
-        ResultSet resultSet = null;
-
-        try (Connection connection = openConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
+        try {
             String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
+
             Method method = this.getClass().getDeclaredMethod(methodName);
-            Map<String, String> manyToOneMap = EntityFunctions.getManyToOneMap(method);
+            Map<String, String> manyToOneMap = EntityFunctions.scanManyToOne(method);
 
-            statement.setString(1, manyToOneMap.get("referencedTable"));
-            statement.setString(2, manyToOneMap.get("column"));
-            statement.setInt(3, this.getId());
+            DataAnnotationProcessor processor = EntityFunctions.createProcessor(this.getClass());
+            String tableName = processor.getTable();
 
-            resultSet = statement.executeQuery();
+            String query = "SELECT * " +
+                    "FROM " + manyToOneMap.get("referencedTable") + " " +
+                    "WHERE id = (SELECT " + manyToOneMap.get("column") + " FROM " + tableName + " WHERE id = ?)";
 
-            if (resultSet.next()) {
-                Class<?> returnType = method.getReturnType();
-//                entity = (Entity) returnType.newInstance();
-                entity = (Entity) returnType.getConstructor().newInstance();
-                List<Field> fieldList = EntityFunctions.getFields(returnType);
-                EntityFunctions.setFields(entity, fieldList, resultSet);
+            try (Connection connection = openConnection();
+                 PreparedStatement statement = connection.prepareStatement(query)) {
+
+                statement.setInt(1, this.getId());
+
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet.next()) {
+                    Class<?> returnType = method.getReturnType();
+                    Entity entityInstance = (Entity) returnType.getConstructor().newInstance();
+                    List<Field> fieldList = EntityFunctions.loadFields(returnType);
+                    EntityFunctions.setFields(entityInstance, fieldList, resultSet);
+                    entity = Optional.of(entityInstance);
+                }
+
+                resultSet.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) resultSet.close();
         }
 
         return entity;
     }
 
-    protected List<? extends Entity> oneToMany() throws SQLException {
-        List<Entity> entityList = null;
+    protected List<? extends Entity> oneToMany() {
 
-        String table = processor.getTable();
+        List<Entity> entityList = new ArrayList<>();
 
-        String query = "SELECT * " +
-                "FROM ? " +
-                "WHERE ? = (SELECT id FROM " + table + " WHERE id = ?)";
-
-        ResultSet resultSet = null;
-
-        try (Connection connection = openConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
+        try {
             String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
+
             Method method = this.getClass().getDeclaredMethod(methodName);
-            Map<String, String> oneToManyMap = EntityFunctions.getOneToManyMap(method);
+            Map<String, String> oneToManyMap = EntityFunctions.scanOneToMany(method);
 
+            DataAnnotationProcessor processor = EntityFunctions.createProcessor(this.getClass());
+            String table = processor.getTable();
 
-            statement.setString(1, oneToManyMap.get("table"));
-            statement.setString(2, oneToManyMap.get("referenceColumn"));
-            statement.setInt(3, this.getId());
+            String query = "SELECT * " +
+                    "FROM " + oneToManyMap.get("table") + " " +
+                    "WHERE " + oneToManyMap.get("referenceColumn") + " = (SELECT id FROM " + table + " WHERE id = ?)";
 
-            resultSet = statement.executeQuery();
+            try (Connection connection = openConnection();
+                 PreparedStatement statement = connection.prepareStatement(query)) {
 
-            entityList = new ArrayList<>();
+                statement.setInt(1, this.getId());
 
-            Type listType = method.getGenericReturnType();
-            Type elementType = ((ParameterizedType) listType).getActualTypeArguments()[0];
+                ResultSet resultSet = statement.executeQuery();
 
-            Class<?> elementClass = Class.forName(elementType.getTypeName());
+                Type listType = method.getGenericReturnType();
+                Type elementType = ((ParameterizedType) listType).getActualTypeArguments()[0];
 
-            while (resultSet.next()) {
-//                Entity entity = (Entity) elementClass.newInstance();
-                Entity entity = (Entity) elementClass.getConstructor().newInstance();
-                List<Field> fieldList = EntityFunctions.getFields(elementClass);
-                EntityFunctions.setFields(entity, fieldList, resultSet);
-                entityList.add(entity);
+                Class<?> elementClass = Class.forName(elementType.getTypeName());
+
+                while (resultSet.next()) {
+                    Entity entity = (Entity) elementClass.getConstructor().newInstance();
+                    List<Field> fieldList = EntityFunctions.loadFields(elementClass);
+                    EntityFunctions.setFields(entity, fieldList, resultSet);
+                    entityList.add(entity);
+                }
+                resultSet.close();
+            } catch (InstantiationException | InvocationTargetException |
+                    SQLException | IllegalAccessException |
+                    ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) resultSet.close();
         }
 
         return entityList;
