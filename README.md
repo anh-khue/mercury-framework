@@ -1,11 +1,8 @@
 # AK Framework
 
-*Project is under re-construction on branch re-structure for cleaner and better packages hierachy.*
-
 AK Framework for Java Application Development - created due to too much of free time.
 
 **Configuration for connecting to Database is required to be suppplied at ```connection.xml``` file in ```resources```**
-
 I. Data Mapping
 1. Database
 - Database must be already created.
@@ -60,5 +57,4 @@ public class UserRepository extends CrudRepository<User> {}
    - ```findById(id)``` for Basic Entity or ```findById(id1, id2,...)``` for Intermediate Model (number of parameters must equal the number of fields which is annotated with ```@CombineKey```, respectively.
    - ```save(model)```
    - ```remove(id)``` or ```remove(id1, id2,...)```
-   
- ***Re-constructing packages and fixing bugs on Query Builder feature for handling complex queries***
+
