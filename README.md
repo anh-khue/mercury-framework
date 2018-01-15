@@ -1,4 +1,4 @@
-# AK Framework
+# Mercury Framework
 
 Framework for Java Application Development.
 
