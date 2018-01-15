@@ -1,4 +1,4 @@
-# Mercury Framework
+# Osiris Framework
 
 Framework for Java Application Development.
 
