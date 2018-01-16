@@ -5,7 +5,7 @@ import com.osiris.data.orm.annotation.Column;
 import com.osiris.data.orm.annotation.CombineKey;
 import com.osiris.data.orm.annotation.Table;
 import com.osiris.data.orm.binding.DTOBindings;
-import com.osiris.data.orm.binding.DataTransferHandler;
+import com.osiris.data.orm.binding.DataBindingHandler;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -38,11 +38,11 @@ public class JpaEntityBindings implements DTOBindings {
 
     @Override
     public List<String> columns() {
-        return DataTransferHandler.fetchColumns(entityClass);
+        return DataBindingHandler.fetchColumns(entityClass);
     }
 
     @Override
     public List<Field> fields() {
-        return DataTransferHandler.loadFields(entityClass);
+        return DataBindingHandler.fetchFields(entityClass);
     }
 }

@@ -1,4 +1,4 @@
-@file:JvmName("DataTransferHandler")
+@file:JvmName("DataBindingHandler")
 
 package com.osiris.data.orm.binding
 
@@ -26,11 +26,11 @@ fun fetchColumns(entityClass: Class<*>): List<String> {
     return columns
 }
 
-fun loadFields(entityClass: Class<*>): List<Field> {
+fun fetchFields(entityClass: Class<*>): List<Field> {
     val fieldList = ArrayList<Field>()
     
     if (entityClass.superclass != null) {
-        fieldList.addAll(loadFields(entityClass.superclass))
+        fieldList.addAll(fetchFields(entityClass.superclass))
     }
     
     val modelFieldArray = entityClass.declaredFields

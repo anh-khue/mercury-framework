@@ -1,4 +1,4 @@
-@file:JvmName("RelationScanner")
+@file:JvmName("RelationBindingHandler")
 
 package com.osiris.data.orm.relation
 
@@ -7,7 +7,7 @@ import com.osiris.data.orm.annotation.OneToMany
 import java.lang.reflect.Method
 import java.util.*
 
-fun scanManyToOne(method: Method): Map<String, String> {
+fun fetchManyToOne(method: Method): Map<String, String> {
     val relationMap = HashMap<String, String>()
     
     val annotation = method.getAnnotation(ManyToOne::class.java)
@@ -18,8 +18,7 @@ fun scanManyToOne(method: Method): Map<String, String> {
     return relationMap
 }
 
-
-fun scanOneToMany(method: Method): Map<String, String> {
+fun fetchOneToMany(method: Method): Map<String, String> {
     val relationMap = HashMap<String, String>()
     
     val annotation = method.getAnnotation(OneToMany::class.java)

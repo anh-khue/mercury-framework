@@ -5,9 +5,8 @@ import com.osiris.data.connection.ConnectionFactory;
 import com.osiris.data.connection.xml.XmlConnectionFactory;
 import com.osiris.data.jpa.Entity;
 import com.osiris.data.jpa.binding.JpaEntityBindings;
-import com.osiris.data.orm.binding.DataTransferHandler;
+import com.osiris.data.orm.binding.DataBindingHandler;
 import com.osiris.data.orm.relation.RelationBindings;
-import com.osiris.data.orm.relation.RelationScanner;
 
 import java.lang.reflect.*;
 import java.sql.Connection;
@@ -18,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.osiris.data.orm.relation.RelationBindingHandler.fetchManyToOne;
+import static com.osiris.data.orm.relation.RelationBindingHandler.fetchOneToMany;
 
 public class JpaRelationBindings implements RelationBindings {
 
@@ -44,7 +46,7 @@ public class JpaRelationBindings implements RelationBindings {
             String methodName = Thread.currentThread().getStackTrace()[3].getMethodName();
 
             Method method = entityClass.getDeclaredMethod(methodName);
-            Map<String, String> manyToOneMap = RelationScanner.scanManyToOne(method);
+            Map<String, String> manyToOneMap = fetchManyToOne(method);
 
             String table = bindings.table();
 
@@ -63,7 +65,7 @@ public class JpaRelationBindings implements RelationBindings {
                     Class<?> returnType = method.getReturnType();
                     Entity entityInstance = (Entity) returnType.getConstructor().newInstance();
                     List<Field> fieldList = bindings.fields();
-                    DataTransferHandler.setFields(entityInstance, fieldList, resultSet);
+                    DataBindingHandler.setFields(entityInstance, fieldList, resultSet);
                     entity = Optional.of(entityInstance);
                 }
 
@@ -86,7 +88,7 @@ public class JpaRelationBindings implements RelationBindings {
             String methodName = Thread.currentThread().getStackTrace()[3].getMethodName();
 
             Method method = entityClass.getDeclaredMethod(methodName);
-            Map<String, String> oneToManyMap = RelationScanner.scanOneToMany(method);
+            Map<String, String> oneToManyMap = fetchOneToMany(method);
 
             String table = bindings.table();
 
@@ -109,7 +111,7 @@ public class JpaRelationBindings implements RelationBindings {
                 while (resultSet.next()) {
                     Entity entity = (Entity) elementClass.getConstructor().newInstance();
                     List<Field> fieldList = bindings.fields();
-                    DataTransferHandler.setFields(entity, fieldList, resultSet);
+                    DataBindingHandler.setFields(entity, fieldList, resultSet);
                     entityList.add(entity);
                 }
                 resultSet.close();
