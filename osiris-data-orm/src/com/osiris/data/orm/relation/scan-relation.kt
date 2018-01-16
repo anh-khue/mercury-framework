@@ -1,6 +1,6 @@
 @file:JvmName("RelationScanner")
 
-package com.osiris.data.orm.entity
+package com.osiris.data.orm.relation
 
 import com.osiris.data.orm.annotation.ManyToOne
 import com.osiris.data.orm.annotation.OneToMany

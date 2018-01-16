@@ -1,10 +1,10 @@
-package com.osiris.data.common.orm;
+package com.osiris.data.orm.binding;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public interface DataMapper extends Serializable {
+public interface DTOBindings extends Serializable {
 
     String table();
 

@@ -1,6 +1,6 @@
 @file:JvmName("DataTransferHandler")
 
-package com.osiris.data.orm.entity
+package com.osiris.data.orm.binding
 
 import com.osiris.data.common.dto.DTO
 import com.osiris.data.orm.annotation.Column
@@ -8,7 +8,8 @@ import java.lang.reflect.Field
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Timestamp
-import java.util.*
+import java.util.Arrays
+import kotlin.collections.ArrayList
 
 fun fetchColumns(entityClass: Class<*>): List<String> {
     val columns = ArrayList<String>()

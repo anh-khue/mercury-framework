@@ -1,21 +1,22 @@
-package com.osiris.data.orm.entity;
+package com.osiris.data.jpa.binding;
 
 import com.osiris.data.common.dto.DTO;
-import com.osiris.data.common.orm.DataMapper;
 import com.osiris.data.orm.annotation.Column;
 import com.osiris.data.orm.annotation.CombineKey;
 import com.osiris.data.orm.annotation.Table;
+import com.osiris.data.orm.binding.DTOBindings;
+import com.osiris.data.orm.binding.DataTransferHandler;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EntityDataMapper implements DataMapper {
+public class JpaEntityBindings implements DTOBindings {
 
     private final Class<? extends DTO> entityClass;
 
-    public EntityDataMapper(Class<? extends DTO> entityClass) {
+    public JpaEntityBindings(Class<? extends DTO> entityClass) {
         this.entityClass = entityClass;
     }
 

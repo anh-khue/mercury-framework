@@ -1,10 +1,13 @@
-package com.osiris.data.orm.entity;
+package com.osiris.data.jpa.relation;
 
 import com.osiris.data.common.dto.DTO;
-import com.osiris.data.common.orm.DataMapper;
 import com.osiris.data.connection.ConnectionFactory;
 import com.osiris.data.connection.xml.XmlConnectionFactory;
-import com.osiris.data.orm.relation.RelationMapper;
+import com.osiris.data.jpa.Entity;
+import com.osiris.data.jpa.binding.JpaEntityBindings;
+import com.osiris.data.orm.binding.DataTransferHandler;
+import com.osiris.data.orm.relation.RelationBindings;
+import com.osiris.data.orm.relation.RelationScanner;
 
 import java.lang.reflect.*;
 import java.sql.Connection;
@@ -16,29 +19,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class EntityRelationMapper implements RelationMapper {
+public class JpaRelationBindings implements RelationBindings {
 
     private final Class<? extends DTO> entityClass;
     private final ConnectionFactory connectionFactory;
+    private final JpaEntityBindings bindings;
 
-    public EntityRelationMapper(Class<? extends DTO> entityClass) {
+    public JpaRelationBindings(Class<? extends DTO> entityClass) {
         this.entityClass = entityClass;
+        this.bindings = DTOBindings();
         this.connectionFactory = new XmlConnectionFactory();
     }
 
     @Override
-    public DataMapper dataMapper() {
-        return new EntityDataMapper(entityClass);
+    public JpaEntityBindings DTOBindings() {
+        return new JpaEntityBindings(entityClass);
     }
 
     @Override
-    public int getId() {
-        return 0;
-    }
-
-    @Override
-    public Optional<? extends DTO> manyToOne() {
-        Optional<? extends DTO> entity = Optional.empty();
+    public Optional<? extends Entity> manyToOne(int entityId) {
+        Optional<? extends Entity> entity = Optional.empty();
 
         try {
             String methodName = Thread.currentThread().getStackTrace()[3].getMethodName();
@@ -46,7 +46,7 @@ public class EntityRelationMapper implements RelationMapper {
             Method method = entityClass.getDeclaredMethod(methodName);
             Map<String, String> manyToOneMap = RelationScanner.scanManyToOne(method);
 
-            String table = dataMapper().table();
+            String table = bindings.table();
 
             String query = "SELECT * " +
                     "FROM " + manyToOneMap.get("referencedTable") + " " +
@@ -55,14 +55,14 @@ public class EntityRelationMapper implements RelationMapper {
             try (Connection connection = connectionFactory.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
 
-                statement.setInt(1, this.getId());
+                statement.setInt(1, entityId);
 
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet.next()) {
                     Class<?> returnType = method.getReturnType();
-                    DTO entityInstance = (DTO) returnType.getConstructor().newInstance();
-                    List<Field> fieldList = dataMapper().fields();
+                    Entity entityInstance = (Entity) returnType.getConstructor().newInstance();
+                    List<Field> fieldList = bindings.fields();
                     DataTransferHandler.setFields(entityInstance, fieldList, resultSet);
                     entity = Optional.of(entityInstance);
                 }
@@ -79,8 +79,8 @@ public class EntityRelationMapper implements RelationMapper {
     }
 
     @Override
-    public List<? extends DTO> oneToMany() {
-        List<DTO> entityList = new ArrayList<>();
+    public List<? extends Entity> oneToMany(int entityId) {
+        List<Entity> entityList = new ArrayList<>();
 
         try {
             String methodName = Thread.currentThread().getStackTrace()[3].getMethodName();
@@ -88,7 +88,7 @@ public class EntityRelationMapper implements RelationMapper {
             Method method = entityClass.getDeclaredMethod(methodName);
             Map<String, String> oneToManyMap = RelationScanner.scanOneToMany(method);
 
-            String table = dataMapper().table();
+            String table = bindings.table();
 
             String query = "SELECT * " +
                     "FROM " + oneToManyMap.get("table") + " " +
@@ -97,7 +97,7 @@ public class EntityRelationMapper implements RelationMapper {
             try (Connection connection = connectionFactory.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
 
-                statement.setInt(1, this.getId());
+                statement.setInt(1, entityId);
 
                 ResultSet resultSet = statement.executeQuery();
 
@@ -107,8 +107,8 @@ public class EntityRelationMapper implements RelationMapper {
                 Class<?> elementClass = Class.forName(elementType.getTypeName());
 
                 while (resultSet.next()) {
-                    DTO entity = (DTO) elementClass.getConstructor().newInstance();
-                    List<Field> fieldList = dataMapper().fields();
+                    Entity entity = (Entity) elementClass.getConstructor().newInstance();
+                    List<Field> fieldList = bindings.fields();
                     DataTransferHandler.setFields(entity, fieldList, resultSet);
                     entityList.add(entity);
                 }
