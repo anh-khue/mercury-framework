@@ -1,9 +1,9 @@
 @file:JvmName("RelationBindingHandler")
 
-package com.osiris.data.orm.relation
+package com.osiris.data.common.handler
 
-import com.osiris.data.orm.annotation.ManyToOne
-import com.osiris.data.orm.annotation.OneToMany
+import com.osiris.data.common.annotation.ManyToOne
+import com.osiris.data.common.annotation.OneToMany
 import java.lang.reflect.Method
 import java.util.*
 

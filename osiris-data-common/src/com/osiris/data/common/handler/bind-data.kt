@@ -1,9 +1,9 @@
 @file:JvmName("DataBindingHandler")
 
-package com.osiris.data.orm.binding
+package com.osiris.data.common.handler
 
+import com.osiris.data.common.annotation.Column
 import com.osiris.data.common.dto.DTO
-import com.osiris.data.orm.annotation.Column
 import java.lang.reflect.Field
 import java.sql.ResultSet
 import java.sql.SQLException
@@ -42,7 +42,7 @@ fun fetchFields(entityClass: Class<*>): List<Field> {
 @Throws(SQLException::class, IllegalAccessException::class)
 fun setFields(dto: DTO, fieldList: List<Field>, resultSet: ResultSet) {
     for (field in fieldList) {
-        val column = field.getAnnotation(Column::class.java)
+        val column: Column? = field.getAnnotation(Column::class.java)
         if (column != null) {
             field.isAccessible = true
             val value: Any?

@@ -1,12 +1,10 @@
-package com.osiris.data.jpa.relation;
+package com.osiris.data.jpa.common;
 
+import com.osiris.data.common.binding.RelationBindings;
 import com.osiris.data.common.dto.DTO;
 import com.osiris.data.connection.ConnectionFactory;
 import com.osiris.data.connection.xml.XmlConnectionFactory;
 import com.osiris.data.jpa.Entity;
-import com.osiris.data.jpa.binding.JpaEntityBindings;
-import com.osiris.data.orm.binding.DataBindingHandler;
-import com.osiris.data.orm.relation.RelationBindings;
 
 import java.lang.reflect.*;
 import java.sql.Connection;
@@ -18,24 +16,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.osiris.data.orm.relation.RelationBindingHandler.fetchManyToOne;
-import static com.osiris.data.orm.relation.RelationBindingHandler.fetchOneToMany;
+import static com.osiris.data.common.handler.RelationBindingHandler.fetchManyToOne;
+import static com.osiris.data.common.handler.RelationBindingHandler.fetchOneToMany;
 
-public class JpaRelationBindings implements RelationBindings {
+public class EntityRelationBindings implements RelationBindings {
 
     private final Class<? extends DTO> entityClass;
     private final ConnectionFactory connectionFactory;
-    private final JpaEntityBindings bindings;
+    private final EntityDataBindings entityDataBindings;
 
-    public JpaRelationBindings(Class<? extends DTO> entityClass) {
+    EntityRelationBindings(Class<? extends DTO> entityClass) {
         this.entityClass = entityClass;
-        this.bindings = DTOBindings();
+        this.entityDataBindings = dataBindings();
         this.connectionFactory = new XmlConnectionFactory();
     }
 
     @Override
-    public JpaEntityBindings DTOBindings() {
-        return new JpaEntityBindings(entityClass);
+    public EntityDataBindings dataBindings() {
+        return new EntityDataBindings(entityClass);
     }
 
     @Override
@@ -48,7 +46,7 @@ public class JpaRelationBindings implements RelationBindings {
             Method method = entityClass.getDeclaredMethod(methodName);
             Map<String, String> manyToOneMap = fetchManyToOne(method);
 
-            String table = bindings.table();
+            String table = entityDataBindings.table();
 
             String query = "SELECT * " +
                     "FROM " + manyToOneMap.get("referencedTable") + " " +
@@ -63,10 +61,10 @@ public class JpaRelationBindings implements RelationBindings {
 
                 if (resultSet.next()) {
                     Class<?> returnType = method.getReturnType();
-                    Entity entityInstance = (Entity) returnType.getConstructor().newInstance();
-                    List<Field> fieldList = bindings.fields();
-                    DataBindingHandler.setFields(entityInstance, fieldList, resultSet);
-                    entity = Optional.of(entityInstance);
+                    DTO entityInstance = (DTO) returnType.getConstructor().newInstance();
+                    List<Field> fieldList = entityDataBindings.fields();
+                    com.osiris.data.common.handler.DataBindingHandler.setFields(entityInstance, fieldList, resultSet);
+                    entity = Optional.of((Entity) entityInstance);
                 }
 
                 resultSet.close();
@@ -90,7 +88,7 @@ public class JpaRelationBindings implements RelationBindings {
             Method method = entityClass.getDeclaredMethod(methodName);
             Map<String, String> oneToManyMap = fetchOneToMany(method);
 
-            String table = bindings.table();
+            String table = entityDataBindings.table();
 
             String query = "SELECT * " +
                     "FROM " + oneToManyMap.get("table") + " " +
@@ -109,10 +107,10 @@ public class JpaRelationBindings implements RelationBindings {
                 Class<?> elementClass = Class.forName(elementType.getTypeName());
 
                 while (resultSet.next()) {
-                    Entity entity = (Entity) elementClass.getConstructor().newInstance();
-                    List<Field> fieldList = bindings.fields();
-                    DataBindingHandler.setFields(entity, fieldList, resultSet);
-                    entityList.add(entity);
+                    DTO entity = (DTO) elementClass.getConstructor().newInstance();
+                    List<Field> fieldList = entityDataBindings.fields();
+                    com.osiris.data.common.handler.DataBindingHandler.setFields(entity, fieldList, resultSet);
+                    entityList.add((Entity) entity);
                 }
                 resultSet.close();
             } catch (InstantiationException | InvocationTargetException |

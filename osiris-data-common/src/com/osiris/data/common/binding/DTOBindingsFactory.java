@@ -1,4 +1,4 @@
-package com.osiris.data.orm.binding;
+package com.osiris.data.common.binding;
 
 import java.io.Serializable;
 

@@ -1,10 +1,10 @@
-package com.osiris.data.orm.binding;
+package com.osiris.data.common.binding;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public interface DTOBindings extends Serializable {
+public interface DataBindings extends Serializable {
 
     String table();
 
@@ -13,5 +13,4 @@ public interface DTOBindings extends Serializable {
     List<String> columns();
 
     List<Field> fields();
-
 }

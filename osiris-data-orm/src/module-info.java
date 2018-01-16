@@ -4,7 +4,7 @@ module osiris.data.orm {
     requires java.sql;
 
     exports com.osiris.data.orm.binding to osiris.data.jpa;
-    exports com.osiris.data.orm.relation to osiris.data.jpa;
+    exports com.osiris.data.orm.handler to osiris.data.jpa;
 
     exports com.osiris.data.orm.annotation;
 }
