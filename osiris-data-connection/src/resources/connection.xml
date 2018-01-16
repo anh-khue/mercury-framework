@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<connection>
+    <dbms>MySQL</dbms>
+    <driver>com.mysql.jdbc.Driver</driver>
+    <url>jdbc:mysql://0.0.0.0:3306/framework_test_db</url>
+    <username>root</username>
+    <password>password</password>
+</connection>
