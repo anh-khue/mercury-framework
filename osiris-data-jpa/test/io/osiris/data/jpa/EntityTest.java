@@ -1,10 +1,13 @@
 package io.osiris.data.jpa;
 
 import io.osiris.data.common.annotation.Column;
+import io.osiris.data.common.annotation.Generated;
 import io.osiris.data.common.annotation.Id;
+import io.osiris.data.common.annotation.Table;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,51 +16,55 @@ class EntityTest {
 
     @Test
     void idMap() {
-        Drink drink = new Drink(8, 11);
-        Map<String, Serializable> idMap = drink.idMap();
-        assertEquals(idMap.get("test1"), 8);
-        assertEquals(idMap.get("test2"), 11);
-    }
-
-    @Test
-    void manyToOne() {
-
-    }
-
-    @Test
-    void oneToMany() {
-
+        Drink drink = new Drink();
+        drink.id = 1;
+        Map<String, Serializable> drinkIdMap = drink.idMap();
+        assertEquals(drinkIdMap.get("id"), 1);
     }
 }
 
 
+@Table("drinks")
 class Drink extends Entity {
 
     @Id
-    @Column("test1")
-    private int testId1;
-    @Id
-    @Column("test2")
-    private int testId2;
+    @Generated
+    @Column("id")
+    int id;
 
-    Drink(int testId1, int testId2) {
-        this.testId1 = testId1;
-        this.testId2 = testId2;
+    @Column("drink_name")
+    String drinkName;
+
+    @Column("price")
+    double price;
+
+    @Column("created_date")
+    Timestamp createdDate;
+
+    @Column("deleted_date")
+    Timestamp deletedDate;
+
+    public Drink() {
+
     }
 
-    public int getTestId1() {
-        return testId1;
+    @Override
+    public String toString() {
+        return id + " | " + drinkName + " | " + price + " | " + createdDate + " | " + deletedDate;
     }
 
-    public void setTestId1(int testId1) {
-        this.testId1 = testId1;
-    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Drink) {
+            Drink drink = (Drink) obj;
 
-    public int getTestId2() {
-        return testId2;
-    }
+            return this.id == drink.id
+                    && this.drinkName.equals(drink.drinkName)
+                    && this.price == drink.price;
+        }
 
-    public void setTestId2(int testId2) {
-        this.testId2 = testId2;
+        return false;
     }
 }
+
+

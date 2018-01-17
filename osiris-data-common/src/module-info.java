@@ -1,6 +1,6 @@
 module osiris.data.common {
     requires kotlin.stdlib;
-    requires java.sql;
+    requires transitive java.sql;
 
     exports io.osiris.data.common.binding to osiris.data.jpa, osiris.data.repository;
 

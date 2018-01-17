@@ -1,19 +1,17 @@
 package io.osiris.data.repository;
 
-import io.osiris.data.common.annotation.Column;
-import io.osiris.data.common.annotation.Generated;
-import io.osiris.data.common.annotation.Id;
-import io.osiris.data.common.annotation.Table;
-import io.osiris.data.jpa.Entity;
+import io.osiris.data.repository.sample.Drink;
+import io.osiris.data.repository.sample.DrinkHasMaterial;
+import io.osiris.data.repository.sample.DrinkRepository;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CrudRepositoryTest {
 
@@ -28,7 +26,7 @@ class CrudRepositoryTest {
                 .collect(Collectors.toList());
 
         for (int i = 0; i < 6; i++) {
-            expectedList.get(i).id = i + 1;
+            expectedList.get(i).setId(i + 1);
         }
 
         System.out.println("Expected: ");
@@ -49,7 +47,7 @@ class CrudRepositoryTest {
     @Test
     void findById() {
         Drink expected = new Drink("Americano", 25);
-        expected.id = 4;
+        expected.setId(4);
         System.out.println(expected);
 
         DrinkRepository drinkRepository = new DrinkRepository();
@@ -76,19 +74,19 @@ class CrudRepositoryTest {
         int lastIndex = listAfterInsert.size() - 1;
         Drink result = listAfterInsert.get(lastIndex);
 
-        insertedDrink.id = result.id;
+        insertedDrink.setId(result.getId());
         System.out.println(result);
 
         assertEquals(insertedDrink, result);
 
-        drinkRepository.remove(result.id);
+        drinkRepository.remove(result.getId());
 
 //        Save for Update Entity
         Optional<Drink> drinkForUpdate = drinkRepository.findById(1);
 
         drinkForUpdate.ifPresent(forUpdate -> {
-            forUpdate.drinkName = "Vietnamese Black Coffee";
-            forUpdate.price = 19;
+            forUpdate.setDrinkName("Vietnamese Black Coffee");
+            forUpdate.setPrice(19);
             System.out.println(forUpdate);
             drinkRepository.save(forUpdate);
 
@@ -103,59 +101,30 @@ class CrudRepositoryTest {
         Optional<Drink> revertUpdate = drinkRepository.findById(1);
 
         revertUpdate.ifPresent(revert -> {
-            revert.drinkName = "Black Coffee";
-            revert.price = 18;
+            revert.setDrinkName("Black Coffee");
+            revert.setPrice(18);
             System.out.println(revert);
             drinkRepository.save(revert);
         });
     }
-}
 
+    @Test
+    void manyToOne() {
+        DrinkRepository drinkRepository = new DrinkRepository();
+        Drink cappuccino = drinkRepository.findById(5)
+                .orElse(null);
+        assertNotNull(cappuccino);
 
-@Table("drinks")
-class Drink extends Entity {
+        List<DrinkHasMaterial> materialList = cappuccino.getMaterialList();
+        assertNotNull(materialList);
 
-    @Id
-    @Generated
-    @Column("id")
-    int id;
-    @Column("drink_name")
-    String drinkName;
-    @Column("price")
-    double price;
-    @Column("created_date")
-    Timestamp createdDate;
-    @Column("deleted_date")
-    Timestamp deletedDate;
-
-    public Drink() {
-
-    }
-
-    Drink(String drinkName, double price) {
-        this.drinkName = drinkName;
-        this.price = price;
-    }
-
-    @Override
-    public String toString() {
-        return id + " | " + drinkName + " | " + price + " | " + createdDate + " | " + deletedDate;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Drink) {
-            Drink drink = (Drink) obj;
-
-            return this.id == drink.id
-                    && this.drinkName.equals(drink.drinkName)
-                    && this.price == drink.price;
+        for (DrinkHasMaterial drinkHasMaterial : materialList) {
+            Drink drinkFromList = drinkHasMaterial.getDrink();
+            assertEquals(cappuccino, drinkFromList);
         }
-        return false;
     }
-}
 
-
-class DrinkRepository extends CrudRepository<Drink, Integer> {
-
+    @Test
+    void oneToMany() {
+    }
 }

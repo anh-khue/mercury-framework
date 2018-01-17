@@ -67,7 +67,8 @@ public class EntityRelationBindings implements RelationBindings {
                 if (resultSet.next()) {
                     Class<?> returnType = method.getReturnType();
                     Entity entityInstance = (Entity) returnType.getConstructor().newInstance();
-                    List<Field> fieldList = entityDataBindings.fields();
+                    EntityDataBindings dataBindings = new EntityDataBindings((Class<? extends Entity>) returnType);
+                    List<Field> fieldList = dataBindings.fields();
                     setFields(entityInstance, fieldList, resultSet);
                     entity = Optional.of(entityInstance);
                 }
@@ -117,7 +118,8 @@ public class EntityRelationBindings implements RelationBindings {
 
                 while (resultSet.next()) {
                     Entity entity = (Entity) elementClass.getConstructor().newInstance();
-                    List<Field> fieldList = entityDataBindings.fields();
+                    EntityDataBindings dataBindings = new EntityDataBindings((Class<? extends Entity>) elementClass);
+                    List<Field> fieldList = dataBindings.fields();
                     setFields(entity, fieldList, resultSet);
                     entityList.add(entity);
                 }

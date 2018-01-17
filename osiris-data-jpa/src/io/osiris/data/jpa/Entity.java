@@ -13,13 +13,12 @@ import java.util.Optional;
 
 public abstract class Entity implements JpaDTO {
 
-    private final EntityDataBindings dataBindings;
     private final EntityRelationBindings relationBindings;
     private final List<String> idColumns;
 
     protected Entity() {
         EntityBindingsFactory bindingsFactory = new EntityBindingsFactory(this.getClass());
-        this.dataBindings = bindingsFactory.createDataBindings();
+        EntityDataBindings dataBindings = bindingsFactory.createDataBindings();
         this.relationBindings = bindingsFactory.createRelationBindings();
         this.idColumns = dataBindings.idColumns();
     }
@@ -37,13 +36,11 @@ public abstract class Entity implements JpaDTO {
     }
 
     public Optional<? extends Entity> manyToOne() {
-//        TODO: Manage Entity's IDs
         List idValues = DataBindingHandler.fetchIds(this.getClass(), this);
         return relationBindings.manyToOne((Serializable) idValues.get(0));
     }
 
     public List<? extends Entity> oneToMany() {
-//        TODO: Manage Entity 's IDs
         List idValues = DataBindingHandler.fetchIds(this.getClass(), this);
         return relationBindings.oneToMany((Serializable) idValues.get(0));
     }
