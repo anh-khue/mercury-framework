@@ -6,12 +6,44 @@ import io.osiris.data.common.annotation.Table;
 import io.osiris.data.jpa.Entity;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CrudRepositoryTest {
 
     @Test
     void findAll() {
+        List<Drink> expectedList = Stream
+                .of("Black Coffee,18", "Milk Coffee,20",
+                        "Espresso,22", "Americano,25",
+                        "Cappuccino,30", "Latte,30")
+                .map(s -> s.split(","))
+                .map(tuple -> new Drink(tuple[0], Integer.parseInt(tuple[1])))
+                .collect(Collectors.toList());
+
+        for (int i = 0; i < 6; i++) {
+            expectedList.get(i).id = i + 1;
+        }
+
+        System.out.println("Expected: ");
+        expectedList.forEach(System.out::println);
+
+        DrinkRepository drinkRepository = new DrinkRepository();
+        List<Drink> result = drinkRepository.findAll();
+
+        assertEquals(expectedList.size(), result.size());
+
+        System.out.println("Result: ");
+        for (int i = 0; i < result.size(); i++) {
+            System.out.println(result.get(i).toString());
+            assertEquals(expectedList.get(i).id, result.get(i).id);
+            assertEquals(expectedList.get(i).drinkName, result.get(i).drinkName);
+            assertEquals(0, Double.compare(expectedList.get(i).price, result.get(i).price));
+        }
     }
 
     @Test
@@ -32,75 +64,57 @@ class CrudRepositoryTest {
 
     @Test
     void update() {
-        Drink drink = new Drink(8, 11);
-        drink.setField1("Test field 1");
-        drink.setField2("Test field 2");
+        Drink drink = new Drink("Cappuccino", 33);
+        drink.id = 1;
+        drink.createdDate = null;
+        drink.deletedDate = null;
 
-        DrinkRepo drinkRepo = new DrinkRepo();
-        String updateQuery = drinkRepo.update(drink);
+        DrinkRepository drinkRepository = new DrinkRepository();
+        String updateQuery = drinkRepository.update(drink);
 
-        String expected = "UPDATE drink SET test1 = ?,test2 = ?,field1 = ?,field2 = ? WHERE test1 = 8 AND test2 = 11";
+        String expected = "UPDATE drinks SET id = ?,drink_name = ?,price = ?,created_date = ?,deleted_date = ? WHERE id = 1";
 
         assertEquals(expected, updateQuery);
     }
+
+    @Test
+    void insert() {
+        DrinkRepository drinkRepository = new DrinkRepository();
+        String insertQuery = drinkRepository.insert();
+
+        String expected = "INSERT INTO drinks(id,drink_name,price,created_date,deleted_date) VALUES(?,?,?,?,?)";
+
+        assertEquals(expected, insertQuery);
+    }
 }
 
 
-@Table("drink")
+@Table("drinks")
 class Drink extends Entity {
 
     @Id
-    @Column("test1")
-    private int id1;
-    @Id
-    @Column("test2")
-    private int id2;
+    @Column("id")
+    int id;
+    @Column("drink_name")
+    String drinkName;
+    @Column("price")
+    double price;
+    @Column("created_date")
+    Timestamp createdDate;
+    @Column("deleted_date")
+    Timestamp deletedDate;
 
-    @Column("field1")
-    private String field1;
+    public Drink() {
 
-    @Column("field2")
-    private String field2;
-
-    Drink(int id1, int id2) {
-        this.id1 = id1;
-        this.id2 = id2;
     }
 
-    public int getId1() {
-        return id1;
-    }
-
-    public void setId1(int id1) {
-        this.id1 = id1;
-    }
-
-    public int getId2() {
-        return id2;
-    }
-
-    public void setId2(int id2) {
-        this.id2 = id2;
-    }
-
-    public String getField1() {
-        return field1;
-    }
-
-    public void setField1(String field1) {
-        this.field1 = field1;
-    }
-
-    public String getField2() {
-        return field2;
-    }
-
-    public void setField2(String field2) {
-        this.field2 = field2;
+    Drink(String drinkName, double price) {
+        this.drinkName = drinkName;
+        this.price = price;
     }
 }
 
 
-class DrinkRepo extends CrudRepository<Drink, Integer> {
+class DrinkRepository extends CrudRepository<Drink, Integer> {
 
 }

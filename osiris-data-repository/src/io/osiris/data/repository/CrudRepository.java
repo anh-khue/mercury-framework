@@ -114,16 +114,14 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
         return "UPDATE " + table + " SET " + valuesTuple + " WHERE " + idBuilder.toString();
     }
 
-    private String insert() {
+    public String insert() {
         StringBuilder columns = new StringBuilder("");
         columns.append(this.columns
-                .subList(1, this.columns.size())
                 .stream()
                 .collect(Collectors.joining(",")));
 
         StringBuilder values = new StringBuilder("");
         values.append(this.columns
-                .subList(1, this.columns.size())
                 .stream()
                 .map(col -> "?")
                 .collect(Collectors.joining(",")));
