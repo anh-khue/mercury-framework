@@ -10,6 +10,8 @@ public interface DataBindings extends Serializable {
 
     List<String> idColumns();
 
+    List<String> generatedColumns();
+
     List<String> columns();
 
     List<Field> fields();

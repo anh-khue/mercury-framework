@@ -1,6 +1,7 @@
 package io.osiris.data.repository;
 
 import io.osiris.data.common.annotation.Column;
+import io.osiris.data.common.annotation.Generated;
 import io.osiris.data.common.annotation.Id;
 import io.osiris.data.common.annotation.Table;
 import io.osiris.data.jpa.Entity;
@@ -41,9 +42,7 @@ class CrudRepositoryTest {
         System.out.println("Result: ");
         for (int i = 0; i < result.size(); i++) {
             System.out.println(result.get(i).toString());
-            assertEquals(expectedList.get(i).id, result.get(i).id);
-            assertEquals(expectedList.get(i).drinkName, result.get(i).drinkName);
-            assertEquals(0, Double.compare(expectedList.get(i).price, result.get(i).price));
+            assertEquals(expectedList.get(i), result.get(i));
         }
     }
 
@@ -58,47 +57,57 @@ class CrudRepositoryTest {
 
         result.ifPresent(drink -> {
             System.out.println(drink);
-            assertEquals(expected.id, drink.id);
-            assertEquals(expected.drinkName, drink.drinkName);
-            assertEquals(0, Double.compare(expected.price, drink.price));
+            assertEquals(expected, drink);
         });
     }
 
     @Test
     void save() {
-    }
+//        Save for Insert new Entity
 
-    @Test
-    void remove() {
-    }
-
-    @Test
-    void findAll1() {
-    }
-
-    @Test
-    void update() {
-        Drink drink = new Drink("Cappuccino", 33);
-        drink.id = 1;
-        drink.createdDate = null;
-        drink.deletedDate = null;
+        Drink insertedDrink = new Drink("Matcha", 33);
+        System.out.println(insertedDrink);
 
         DrinkRepository drinkRepository = new DrinkRepository();
-        String updateQuery = drinkRepository.update(drink);
+        drinkRepository.save(insertedDrink);
 
-        String expected = "UPDATE drinks SET id = ?,drink_name = ?,price = ?,created_date = ?,deleted_date = ? WHERE id = 1";
+        List<Drink> listAfterInsert = drinkRepository.findAll();
 
-        assertEquals(expected, updateQuery);
-    }
+        int lastIndex = listAfterInsert.size() - 1;
+        Drink result = listAfterInsert.get(lastIndex);
 
-    @Test
-    void insert() {
-        DrinkRepository drinkRepository = new DrinkRepository();
-        String insertQuery = drinkRepository.insert();
+        insertedDrink.id = result.id;
+        System.out.println(result);
 
-        String expected = "INSERT INTO drinks(id,drink_name,price,created_date,deleted_date) VALUES(?,?,?,?,?)";
+        assertEquals(insertedDrink, result);
 
-        assertEquals(expected, insertQuery);
+        drinkRepository.remove(result.id);
+
+//        Save for Update Entity
+        Optional<Drink> drinkForUpdate = drinkRepository.findById(1);
+
+        drinkForUpdate.ifPresent(forUpdate -> {
+            forUpdate.drinkName = "Vietnamese Black Coffee";
+            forUpdate.price = 19;
+            System.out.println(forUpdate);
+            drinkRepository.save(forUpdate);
+
+            Optional<Drink> drinkAfterUpdate = drinkRepository.findById(1);
+
+            drinkAfterUpdate.ifPresent(afterUpdate -> {
+                System.out.println(afterUpdate);
+                assertEquals(forUpdate, afterUpdate);
+            });
+        });
+
+        Optional<Drink> revertUpdate = drinkRepository.findById(1);
+
+        revertUpdate.ifPresent(revert -> {
+            revert.drinkName = "Black Coffee";
+            revert.price = 18;
+            System.out.println(revert);
+            drinkRepository.save(revert);
+        });
     }
 }
 
@@ -107,6 +116,7 @@ class CrudRepositoryTest {
 class Drink extends Entity {
 
     @Id
+    @Generated
     @Column("id")
     int id;
     @Column("drink_name")
@@ -125,6 +135,23 @@ class Drink extends Entity {
     Drink(String drinkName, double price) {
         this.drinkName = drinkName;
         this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return id + " | " + drinkName + " | " + price + " | " + createdDate + " | " + deletedDate;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Drink) {
+            Drink drink = (Drink) obj;
+
+            return this.id == drink.id
+                    && this.drinkName.equals(drink.drinkName)
+                    && this.price == drink.price;
+        }
+        return false;
     }
 }
 

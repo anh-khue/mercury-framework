@@ -1,6 +1,7 @@
 package io.osiris.data.jpa.binding;
 
 import io.osiris.data.common.annotation.Column;
+import io.osiris.data.common.annotation.Generated;
 import io.osiris.data.common.annotation.Id;
 import io.osiris.data.common.annotation.Table;
 import io.osiris.data.common.binding.DataBindings;
@@ -32,6 +33,16 @@ public class EntityDataBindings implements DataBindings {
 
         return Arrays.stream(fields)
                 .filter(field -> field.getAnnotation(Id.class) != null)
+                .map(field -> field.getAnnotation(Column.class).value())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> generatedColumns() {
+        Field[] fields = entityClass.getDeclaredFields();
+
+        return Arrays.stream(fields)
+                .filter(field -> field.getAnnotation(Generated.class) != null)
                 .map(field -> field.getAnnotation(Column.class).value())
                 .collect(Collectors.toList());
     }
