@@ -3,8 +3,8 @@ module osiris.data.orm {
     requires kotlin.stdlib;
     requires java.sql;
 
-    exports com.osiris.data.orm.binding to osiris.data.jpa;
-    exports com.osiris.data.orm.handler to osiris.data.jpa;
+    exports io.osiris.data.orm.binding to osiris.data.jpa;
+    exports io.osiris.data.orm.handler to osiris.data.jpa;
 
-    exports com.osiris.data.orm.annotation;
+    exports io.osiris.data.orm.annotation;
 }
