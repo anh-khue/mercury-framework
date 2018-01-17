@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,11 +40,13 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
     private final String table;
     private final List<String> columns;
     private final List<Field> fields;
+    private final List<String> idColumns;
 
     public CrudRepository() {
         this.table = dataBindings.table();
         this.columns = dataBindings.columns();
         this.fields = dataBindings.fields();
+        this.idColumns = dataBindings.idColumns();
     }
 
     @Override
@@ -83,17 +86,32 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
 
     }
 
-    private String update(Entity entity) {
+    public String update(Entity entity) {
         StringBuilder valuesTuple = new StringBuilder("");
         valuesTuple.append(
-                columns.subList(1, columns.size())
+                columns
                         .stream()
                         .map(col -> col + " = ?")
                         .collect(Collectors.joining(","))
         );
 
-//        return "UPDATE " + table + " SET " + valuesTuple + " WHERE id = " + entity.getId();
-        return null;
+        Map<String, Serializable> idMap = entity.idMap();
+
+        StringBuilder idBuilder = new StringBuilder(idColumns.get(0))
+                .append(" = ")
+                .append(idMap.get(idColumns.get(0)));
+
+        if (idColumns.size() > 1) {
+            for (String column : idColumns.subList(1, idColumns.size())) {
+                idBuilder.append(" AND ")
+                        .append(column)
+                        .append(" = ")
+                        .append(idMap.get(column));
+            }
+        }
+
+        System.out.println("UPDATE " + table + " SET " + valuesTuple + " WHERE " + idBuilder.toString());
+        return "UPDATE " + table + " SET " + valuesTuple + " WHERE " + idBuilder.toString();
     }
 
     private String insert() {

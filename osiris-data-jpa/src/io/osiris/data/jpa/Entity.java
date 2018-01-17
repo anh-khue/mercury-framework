@@ -38,11 +38,13 @@ public abstract class Entity implements JpaDTO {
 
     public Optional<? extends Entity> manyToOne() {
 //        TODO: Manage Entity's IDs
-        return relationBindings.manyToOne(-1);
+        List idValues = DataBindingHandler.fetchIds(this.getClass(), this);
+        return relationBindings.manyToOne((Serializable) idValues.get(0));
     }
 
     public List<? extends Entity> oneToMany() {
 //        TODO: Manage Entity 's IDs
-        return relationBindings.oneToMany(-1);
+        List idValues = DataBindingHandler.fetchIds(this.getClass(), this);
+        return relationBindings.oneToMany((Serializable) idValues.get(0));
     }
 }

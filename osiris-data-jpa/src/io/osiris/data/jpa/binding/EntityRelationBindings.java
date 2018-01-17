@@ -5,6 +5,7 @@ import io.osiris.data.connection.ConnectionFactory;
 import io.osiris.data.connection.xml.XmlConnectionFactory;
 import io.osiris.data.jpa.Entity;
 
+import java.io.Serializable;
 import java.lang.reflect.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,7 +38,7 @@ public class EntityRelationBindings implements RelationBindings {
     }
 
     @Override
-    public Optional<? extends Entity> manyToOne(int entityId) {
+    public Optional<? extends Entity> manyToOne(Serializable entityId) {
         Optional<? extends Entity> entity = Optional.empty();
 
         try {
@@ -55,7 +56,11 @@ public class EntityRelationBindings implements RelationBindings {
             try (Connection connection = connectionFactory.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
 
-                statement.setInt(1, entityId);
+                if (entityId instanceof Integer) {
+                    statement.setInt(1, (Integer) entityId);
+                } else {
+                    statement.setLong(1, (Long) entityId);
+                }
 
                 ResultSet resultSet = statement.executeQuery();
 
@@ -79,7 +84,7 @@ public class EntityRelationBindings implements RelationBindings {
     }
 
     @Override
-    public List<? extends Entity> oneToMany(int entityId) {
+    public List<? extends Entity> oneToMany(Serializable entityId) {
         List<Entity> entityList = new ArrayList<>();
 
         try {
@@ -97,7 +102,11 @@ public class EntityRelationBindings implements RelationBindings {
             try (Connection connection = connectionFactory.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
 
-                statement.setInt(1, entityId);
+                if (entityId instanceof Integer) {
+                    statement.setInt(1, (Integer) entityId);
+                } else {
+                    statement.setLong(1, (Long) entityId);
+                }
 
                 ResultSet resultSet = statement.executeQuery();
 

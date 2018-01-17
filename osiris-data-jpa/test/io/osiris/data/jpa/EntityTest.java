@@ -35,10 +35,10 @@ class Drink extends Entity {
 
     @Id
     @Column("test1")
-    private Integer testId1;
+    private int testId1;
     @Id
     @Column("test2")
-    private Integer testId2;
+    private int testId2;
 
     Drink(int testId1, int testId2) {
         this.testId1 = testId1;
