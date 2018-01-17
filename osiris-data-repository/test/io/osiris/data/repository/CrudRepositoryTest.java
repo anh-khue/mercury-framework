@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,6 +49,19 @@ class CrudRepositoryTest {
 
     @Test
     void findById() {
+        Drink expected = new Drink("Americano", 25);
+        expected.id = 4;
+        System.out.println(expected);
+
+        DrinkRepository drinkRepository = new DrinkRepository();
+        Optional<Drink> result = drinkRepository.findById(4);
+
+        result.ifPresent(drink -> {
+            System.out.println(drink);
+            assertEquals(expected.id, drink.id);
+            assertEquals(expected.drinkName, drink.drinkName);
+            assertEquals(0, Double.compare(expected.price, drink.price));
+        });
     }
 
     @Test

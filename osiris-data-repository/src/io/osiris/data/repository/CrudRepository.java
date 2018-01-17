@@ -72,8 +72,38 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
     }
 
     @Override
-    public Optional<? extends Entity> findById(Serializable[] id) {
-        return Optional.empty();
+    public Optional<T> findById(Serializable... ids) {
+        Optional<T> entity = Optional.empty();
+
+        String query = "SELECT * FROM " + table + " WHERE " +
+                idColumns.stream()
+                        .map(idColumn -> idColumn + " = ?")
+                        .collect(Collectors.joining(" AND "));
+
+        try (Connection connection = connectionFactory.openConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            for (int i = 0; i < ids.length; i++) {
+                if (ids[i] instanceof Integer) {
+                    statement.setInt((i + 1), (Integer) ids[i]);
+                } else {
+                    statement.setLong((i + 1), (Long) ids[i]);
+                }
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                T result = entityClass.getConstructor().newInstance();
+                setFields(result, fields, resultSet);
+                entity = Optional.of(result);
+            }
+
+            resultSet.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return entity;
     }
 
     @Override
@@ -82,7 +112,7 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
     }
 
     @Override
-    public void remove(Serializable[] id) {
+    public void remove(Serializable... id) {
 
     }
 
