@@ -5,6 +5,7 @@ import io.osiris.data.repository.sample.DrinkHasMaterial;
 import io.osiris.data.repository.sample.DrinkRepository;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -126,5 +127,22 @@ class CrudRepositoryTest {
 
     @Test
     void oneToMany() {
+        DrinkRepository drinkRepository = new DrinkRepository();
+        Drink milkCoffee = drinkRepository.findById(2)
+                .orElse(null);
+        assertNotNull(milkCoffee);
+
+        List<DrinkHasMaterial> materialList = milkCoffee.getMaterialList();
+        assertNotNull(materialList);
+
+        List<DrinkHasMaterial> expectedList = new ArrayList<>();
+        expectedList.add(new DrinkHasMaterial(2, 1));
+        expectedList.add(new DrinkHasMaterial(2, 2));
+        expectedList.add(new DrinkHasMaterial(2, 3));
+
+        assertEquals(expectedList.size(), materialList.size());
+        for (int i = 0; i < materialList.size(); i++) {
+            assertEquals(expectedList.get(i), materialList.get(i));
+        }
     }
 }

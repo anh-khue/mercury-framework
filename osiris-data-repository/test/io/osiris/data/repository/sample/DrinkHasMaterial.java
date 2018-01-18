@@ -67,4 +67,14 @@ public class DrinkHasMaterial extends Entity {
     public void setId(int id) {
         this.id = id;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DrinkHasMaterial) {
+            DrinkHasMaterial dhm = (DrinkHasMaterial) obj;
+            return dhm.getDrinkId() == this.drinkId
+                    && dhm.getMaterialId() == this.getMaterialId();
+        }
+        return false;
+    }
 }
