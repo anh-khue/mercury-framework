@@ -7,12 +7,12 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class XmlConnectionFactoryTest {
+class XmlConnectionTest {
 
     @Test
     void openConnection() {
         try {
-            XmlConnectionFactory connectionFactory = new XmlConnectionFactory();
+            XmlConnection connectionFactory = new XmlConnection();
             Connection connection = connectionFactory.openConnection();
 
             assertNotNull(connection);

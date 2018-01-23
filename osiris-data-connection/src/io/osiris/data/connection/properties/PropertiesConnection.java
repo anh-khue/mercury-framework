@@ -1,16 +1,13 @@
-package io.osiris.data.connection.xml;
-
-import io.osiris.data.connection.ConnectionFactory;
+package io.osiris.data.connection.properties;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class XmlConnectionFactory implements ConnectionFactory {
+public class PropertiesConnection {
+    private static final PropertiesReader CONNECTION_PROPERTIES = PropertiesReader.INSTANCE;
 
-    private final ConnectionProperties CONNECTION_PROPERTIES = ConnectionProperties.INSTANCE;
-
-    public Connection openConnection() throws ClassNotFoundException, SQLException {
+    public static Connection openConnection() throws ClassNotFoundException, SQLException {
 
         Class.forName(CONNECTION_PROPERTIES.getDriverClass());
 

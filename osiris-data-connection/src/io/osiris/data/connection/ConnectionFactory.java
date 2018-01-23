@@ -1,11 +1,20 @@
 package io.osiris.data.connection;
 
-import java.io.Serializable;
+import io.osiris.data.connection.properties.PropertiesConnection;
+import io.osiris.data.connection.xml.XmlConnection;
+
+import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public interface ConnectionFactory extends Serializable {
+public class ConnectionFactory implements ConnectionProvider {
 
-    Connection openConnection() throws ClassNotFoundException, SQLException;
+    @Override
+    public Connection openConnection() throws ClassNotFoundException, SQLException {
+        boolean propertiesFileExist = new File("resources", "connection.properties").exists();
 
+        if (propertiesFileExist) return PropertiesConnection.openConnection();
+
+        return XmlConnection.openConnection();
+    }
 }
