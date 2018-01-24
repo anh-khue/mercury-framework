@@ -2,8 +2,8 @@ package io.osiris.data.repository;
 
 import io.osiris.data.common.annotation.Column;
 import io.osiris.data.common.annotation.Generated;
-import io.osiris.data.connection.ConnectionProvider;
-import io.osiris.data.connection.xml.XmlConnection;
+import io.osiris.data.connection.ConnectionFactory;
+import io.osiris.data.connection.ConnectionAdapter;
 import io.osiris.data.jpa.Entity;
 import io.osiris.data.jpa.binding.EntityBindingsFactory;
 import io.osiris.data.jpa.binding.EntityDataBindings;
@@ -26,7 +26,7 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
             .getGenericSuperclass())
             .getActualTypeArguments()[0];
 
-    private final ConnectionProvider connectionProvider = new XmlConnection();
+    private final ConnectionAdapter connectionFactory = new ConnectionFactory();
 
     private final String table;
     private final List<String> idColumns;
@@ -51,7 +51,7 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
 
         String query = "SELECT * FROM " + table;
 
-        try (Connection connection = connectionProvider.openConnection();
+        try (Connection connection = connectionFactory.openConnection();
              PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
 
@@ -76,7 +76,7 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
                         .map(idColumn -> idColumn + " = ?")
                         .collect(Collectors.joining(" AND "));
 
-        try (Connection connection = connectionProvider.openConnection();
+        try (Connection connection = connectionFactory.openConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             for (int i = 0; i < ids.length; i++) {
                 if (ids[i] instanceof Integer) {
@@ -109,7 +109,7 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
         String query = findById(entityIds.toArray(new Serializable[entityIds.size()])).isPresent() ?
                 update(entity) : insert();
 
-        try (Connection connection = connectionProvider.openConnection();
+        try (Connection connection = connectionFactory.openConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             int parameterCount = 0;
@@ -147,7 +147,7 @@ public abstract class CrudRepository<T extends Entity, R extends Serializable> i
                         .map(idColumn -> idColumn + " = ?")
                         .collect(Collectors.joining(" AND "));
 
-        try (Connection connection = connectionProvider.openConnection();
+        try (Connection connection = connectionFactory.openConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             for (int i = 0; i < ids.length; i++) {

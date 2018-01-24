@@ -1,7 +1,7 @@
 package io.osiris.data.connection.xml
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 internal class XmlPropertiesTest {
 
@@ -12,12 +12,12 @@ internal class XmlPropertiesTest {
 
     @Test
     fun getUrl() {
-        assertEquals("jdbc:mysql://localhost:3306/osiris_test_db", XmlReader.url)
+        assertEquals("jdbc:mysql://0.0.0.0:3306/osiris_test_db", XmlReader.url)
     }
 
     @Test
     fun getUsername() {
-        assertEquals("osiris", XmlReader.username)
+        assertEquals("osiris-master", XmlReader.username)
     }
 
     @Test

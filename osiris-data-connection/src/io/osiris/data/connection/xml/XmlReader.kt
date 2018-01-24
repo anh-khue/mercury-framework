@@ -1,13 +1,13 @@
 package io.osiris.data.connection.xml
 
-import io.osiris.data.connection.ConnectionReadable
+import io.osiris.data.connection.ConnectionReader
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.io.File
 import java.io.FileNotFoundException
 import javax.xml.parsers.DocumentBuilderFactory
 
-object XmlReader : ConnectionReadable {
+object XmlReader : ConnectionReader {
     override fun getDriverClass(): String {
         return getPropertyFromNode("driver") ?: fail()
     }
@@ -26,10 +26,7 @@ object XmlReader : ConnectionReadable {
 }
 
 private val xmlFile: File? = try {
-    val classLoader = Thread.currentThread().contextClassLoader
-    val url = classLoader.getResource("resources/connection.xml")
-
-    File(url.file)
+    File(ClassLoader.getSystemResource("resources/connection.xml").file)
 } catch (e: FileNotFoundException) {
     null
 }

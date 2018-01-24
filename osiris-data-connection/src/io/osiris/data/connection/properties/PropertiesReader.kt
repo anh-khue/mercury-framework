@@ -1,37 +1,37 @@
 package io.osiris.data.connection.properties
 
-import io.osiris.data.connection.ConnectionReadable
+import io.osiris.data.connection.ConnectionReader
 
-import java.io.FileInputStream
-import java.io.IOException
+import java.io.FileNotFoundException
 import java.util.Properties
 
-object PropertiesReader : ConnectionReadable {
+object PropertiesReader : ConnectionReader {
 
     override fun getDriverClass(): String {
-        return properties.getProperty("driver")
+        return getProperties().getProperty("driver")
     }
 
     override fun getUrl(): String {
-        return properties.getProperty("url")
+        return getProperties().getProperty("url")
     }
 
     override fun getUsername(): String {
-        return properties.getProperty("username")
+        return getProperties().getProperty("username")
     }
 
     override fun getPassword(): String {
-        return properties.getProperty("password")
+        return getProperties().getProperty("password")
     }
 }
 
-private val properties: Properties = try {
-    val inputStream = FileInputStream("resources/connection.properties")
-
+private fun getProperties(): Properties = try {
+    val inputStream = ClassLoader.getSystemResourceAsStream("resources/connection.properties")
     val properties = Properties()
 
     properties.load(inputStream)
     properties
-} catch (e: IOException) {
+} catch (e: FileNotFoundException) {
     Properties()
 }
+
+private fun fail(): Nothing = throw IllegalArgumentException("Error occurs in connection.properties")

@@ -1,8 +1,8 @@
 package io.osiris.data.jpa.binding;
 
 import io.osiris.data.common.binding.RelationBindings;
-import io.osiris.data.connection.ConnectionProvider;
-import io.osiris.data.connection.xml.XmlConnection;
+import io.osiris.data.connection.ConnectionFactory;
+import io.osiris.data.connection.ConnectionAdapter;
 import io.osiris.data.jpa.Entity;
 
 import java.io.Serializable;
@@ -23,13 +23,13 @@ import static io.osiris.data.common.binding.RelationBindingHandler.fetchOneToMan
 public class EntityRelationBindings implements RelationBindings {
 
     private final Class<? extends Entity> entityClass;
-    private final ConnectionProvider connectionProvider;
+    private final ConnectionAdapter connectionAdapter;
     private final EntityDataBindings entityDataBindings;
 
     EntityRelationBindings(Class<? extends Entity> entityClass) {
         this.entityClass = entityClass;
         this.entityDataBindings = dataBindings();
-        this.connectionProvider = new XmlConnection();
+        this.connectionAdapter = new ConnectionFactory();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class EntityRelationBindings implements RelationBindings {
                     "FROM " + manyToOneMap.get("referencedTable") + " " +
                     "WHERE id = (SELECT " + manyToOneMap.get("column") + " FROM " + table + " WHERE id = ?)";
 
-            try (Connection connection = connectionProvider.openConnection();
+            try (Connection connection = connectionAdapter.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
 
                 if (entityId instanceof Integer) {
@@ -100,7 +100,7 @@ public class EntityRelationBindings implements RelationBindings {
                     "FROM " + oneToManyMap.get("value") + " " +
                     "WHERE " + oneToManyMap.get("referenceColumn") + " = (SELECT id FROM " + table + " WHERE id = ?)";
 
-            try (Connection connection = connectionProvider.openConnection();
+            try (Connection connection = connectionAdapter.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
 
                 if (entityId instanceof Integer) {

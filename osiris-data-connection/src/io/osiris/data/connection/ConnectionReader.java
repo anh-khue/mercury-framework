@@ -1,6 +1,6 @@
 package io.osiris.data.connection;
 
-public interface ConnectionReadable {
+public interface ConnectionReader {
     String getDriverClass();
 
     String getUrl();

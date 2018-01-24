@@ -1,19 +1,20 @@
-package io.osiris.data.connection.xml;
+package io.osiris.data.connection;
 
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-class XmlConnectionTest {
+class ConnectionFactoryTest {
 
     @Test
     void openConnection() {
-        try {
-            Connection connection = XmlConnection.openConnection();
 
+        ConnectionFactory factory = new ConnectionFactory();
+        try {
+            Connection connection = factory.openConnection();
             assertNotNull(connection);
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
