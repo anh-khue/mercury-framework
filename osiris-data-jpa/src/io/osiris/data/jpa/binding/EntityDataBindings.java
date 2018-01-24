@@ -18,7 +18,7 @@ public class EntityDataBindings implements DataBindings {
 
     private final Class<? extends Entity> entityClass;
 
-    EntityDataBindings(Class<? extends Entity> entityClass) {
+    public EntityDataBindings(Class<? extends Entity> entityClass) {
         this.entityClass = entityClass;
     }
 

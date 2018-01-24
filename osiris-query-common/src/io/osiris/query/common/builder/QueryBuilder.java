@@ -2,52 +2,45 @@ package io.osiris.query.common.builder;
 
 import io.osiris.data.common.binding.DataBindingHandler;
 import io.osiris.data.common.dto.DTO;
-import io.osiris.data.jpa.Entity;
 import io.osiris.data.jpa.binding.EntityDataBindings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class QueryBuilder implements Builder {
 
-    protected WhereBuilder whereBuilder;
+    protected WhereBuilder whereBuilder = new WhereBuilder(this);
 
     protected static String table;
-    protected static StringBuilder columns = new StringBuilder("");
     protected static StringBuilder distinct = new StringBuilder("");
     protected static StringBuilder limit = new StringBuilder("");
+    protected static StringBuilder columns = new StringBuilder("");
     protected static StringBuilder join = new StringBuilder("");
+    protected static StringBuilder where = new StringBuilder("");
     protected static StringBuilder orderBy = new StringBuilder("");
     protected static StringBuilder groupBy = new StringBuilder("");
     protected static StringBuilder having = new StringBuilder("");
     protected static StringBuilder paging = new StringBuilder("");
 
-    protected static Map<String, List> queryParams = new HashMap<>();
+    QueryBuilder table(Class<DTO> model) {
+        this.model = model;
+        modelAnnotationProcessor = new ModelAnnotationProcessor(model);
+        table = modelAnnotationProcessor.getTableName();
+        table = EntityDataBindings.
+        columns.append(modelAnnotationProcessor.getTableColumns(model)
+                .stream()
+                .collect(Collectors.joining(",")));
+        columns.append(" ");
 
-    protected static ArrayList<Object> parameters = new ArrayList<>();
-
-    public QueryBuilder table(Class<? extends Entity> dtoClass) {
-
-        EntityDataBindings entityDataBindings = new EntityDataBindings(dtoClass);
-        table = entityDataBindings.table();
-        columns.append(
-                DataBindingHandler.fetchColumns(dtoClass)
-                        .stream()
-                        .collect(Collectors.joining(",")))
-                .append(" ");
-
-        whereBuilder = new WhereBuilder(this);
         queryParams.put("limit", new ArrayList());
+        queryParams.put("where", new ArrayList());
         queryParams.put("having", new ArrayList());
         queryParams.put("paging", new ArrayList());
         return this;
     }
 
-    public QueryBuilder distinct() {
-        if (distinct.toString().equals("")) {
-            distinct.append("DISTINCT ");
-        }
-
+    QueryBuilder distinct() {
         return this;
     }
 
@@ -88,11 +81,7 @@ public abstract class QueryBuilder implements Builder {
 
 
     // Group By
-    public QueryBuilder groupBy(String... columns) {
-        groupBy.append("GROUP BY ")
-                .append(Arrays.stream(columns)
-                        .collect(Collectors.joining(", ")))
-                .append(" ");
+    public QueryBuilder groupBy() {
         return this;
     }
 
