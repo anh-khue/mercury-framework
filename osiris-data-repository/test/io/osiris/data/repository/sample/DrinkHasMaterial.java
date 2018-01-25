@@ -7,11 +7,6 @@ import io.osiris.data.jpa.Entity;
 public class DrinkHasMaterial extends Entity {
 
     @Id
-    @Column("id")
-    @Generated
-    private int id;
-
-    @Id
     @Column("drink_id")
     private int drinkId;
 
@@ -48,24 +43,16 @@ public class DrinkHasMaterial extends Entity {
         this.materialId = materialId;
     }
 
-    @ManyToOne(referencedTable = "drinks", column = "drink_id")
+    @ManyToOne(column = "drink_id", table = "drinks", target = "id")
     public Drink getDrink() {
         this.drink = (Drink) manyToOne().orElse(null);
         return this.drink;
     }
 
-    @ManyToOne(referencedTable = "materials", column = "material_id")
+    @ManyToOne(column = "material_id", table = "materials", target = "id")
     public Material getMaterial() {
         this.material = (Material) manyToOne().orElse(null);
         return this.material;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     @Override

@@ -6,7 +6,10 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ManyToOne {
+
     String column() default "";
 
-    String referencedTable() default "";
+    String table() default "";
+
+    String target() default "";
 }
