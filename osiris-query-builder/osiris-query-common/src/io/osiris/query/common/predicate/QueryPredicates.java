@@ -6,9 +6,13 @@ public interface QueryPredicates {
 
     static final String NOT_EQUAL = ">=";
 
-    static final String LARGER_THAN = ">";
+    static final String LARGER = ">";
 
     static final String LARGER_OR_EQUAL = ">=";
+
+    static final String SMALLER = "<";
+
+    static final String SMALLER_OR_EQUAL = "<=";
 
     static final String LIKE = "LIKE";
 

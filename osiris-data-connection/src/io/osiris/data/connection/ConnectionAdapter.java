@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public interface ConnectionFactory extends Serializable {
+public interface ConnectionAdapter extends Serializable {
 
     Connection openConnection() throws ClassNotFoundException, SQLException;
-
 }

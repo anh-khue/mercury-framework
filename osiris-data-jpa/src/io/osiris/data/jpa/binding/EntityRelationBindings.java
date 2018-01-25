@@ -2,7 +2,6 @@ package io.osiris.data.jpa.binding;
 
 import io.osiris.data.common.binding.RelationBindings;
 import io.osiris.data.connection.ConnectionFactory;
-import io.osiris.data.connection.xml.XmlConnectionFactory;
 import io.osiris.data.jpa.Entity;
 
 import java.io.Serializable;
@@ -29,7 +28,7 @@ public class EntityRelationBindings implements RelationBindings {
     EntityRelationBindings(Class<? extends Entity> entityClass) {
         this.entityClass = entityClass;
         this.entityDataBindings = dataBindings();
-        this.connectionFactory = new XmlConnectionFactory();
+        this.connectionFactory = new ConnectionFactory();
     }
 
     @Override

@@ -4,4 +4,5 @@ module osiris.query.common {
     requires osiris.query.tuple;
 
     exports io.osiris.query.common.builder;
+    exports io.osiris.query.common.predicate;
 }

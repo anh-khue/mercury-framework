@@ -2,8 +2,6 @@ package io.osiris.data.repository;
 
 import io.osiris.data.common.annotation.Column;
 import io.osiris.data.common.annotation.Generated;
-import io.osiris.data.connection.ConnectionFactory;
-import io.osiris.data.connection.xml.XmlConnectionFactory;
 import io.osiris.data.jpa.Entity;
 import io.osiris.data.jpa.binding.EntityBindingsFactory;
 import io.osiris.data.jpa.binding.EntityDataBindings;

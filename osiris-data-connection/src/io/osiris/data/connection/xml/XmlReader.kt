@@ -1,23 +1,32 @@
 package io.osiris.data.connection.xml
 
+import io.osiris.data.connection.ConnectionReader
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.io.File
 import java.io.FileNotFoundException
 import javax.xml.parsers.DocumentBuilderFactory
 
-object ConnectionProperties {
-    val driverClass = getPropertyFromNode("driver") ?: fail()
-    val url = getPropertyFromNode("url") ?: fail()
-    val username = getPropertyFromNode("username") ?: fail()
-    val password = getPropertyFromNode("password") ?: fail()
+object XmlReader : ConnectionReader {
+    override fun getDriverClass(): String {
+        return getPropertyFromNode("driver") ?: fail()
+    }
+
+    override fun getUrl(): String {
+        return getPropertyFromNode("url") ?: fail()
+    }
+
+    override fun getUsername(): String {
+        return getPropertyFromNode("username") ?: fail()
+    }
+
+    override fun getPassword(): String {
+        return getPropertyFromNode("password") ?: fail()
+    }
 }
 
 private val xmlFile: File? = try {
-    val classLoader = Thread.currentThread().contextClassLoader
-    val url = classLoader.getResource("resources/connection.xml")
-    
-    File(url.file)
+    File(ClassLoader.getSystemResource("resources/connection.xml").file)
 } catch (e: FileNotFoundException) {
     null
 }
@@ -27,8 +36,8 @@ private val xmlNode: Node? = try {
             .newDocumentBuilder()
             .parse(xmlFile)
     document.documentElement.normalize()
-    
-    document.getElementsByTagName("connection").item(0)
+
+    document.getElementsByTagName("io/osiris/data/connection/connection").item(0)
 } catch (e: Exception) {
     null
 }

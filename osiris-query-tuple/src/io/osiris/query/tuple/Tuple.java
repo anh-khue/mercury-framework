@@ -4,5 +4,7 @@ public interface Tuple {
 
     int size();
 
-    <T> T getValueAt(int index);
+    Object objectAt(int index);
+
+    <T> T valueAt(int index);
 }
