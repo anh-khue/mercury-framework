@@ -13,8 +13,9 @@ fun fetchManyToOne(method: Method): Map<String, String> {
     
     val annotation = method.getAnnotation(ManyToOne::class.java)
     
-    relationMap.put("referencedTable", annotation.referencedTable)
     relationMap.put("column", annotation.column)
+    relationMap.put("table", annotation.table)
+    relationMap.put("target", annotation.target)
     
     return relationMap
 }
@@ -24,8 +25,9 @@ fun fetchOneToMany(method: Method): Map<String, String> {
     
     val annotation = method.getAnnotation(OneToMany::class.java)
     
-    relationMap.put("value", annotation.table)
-    relationMap.put("referenceColumn", annotation.referenceColumn)
+    relationMap.put("table", annotation.table)
+    relationMap.put("column", annotation.column)
+    relationMap.put("target", annotation.target)
     
     return relationMap
 }

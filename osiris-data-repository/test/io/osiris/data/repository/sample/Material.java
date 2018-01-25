@@ -39,7 +39,7 @@ public class Material extends Entity {
         this.materialName = materialName;
     }
 
-    @OneToMany(table = "drink_has_material", referenceColumn = "material_id")
+    @OneToMany(table = "drink_has_material", column = "material_id", target = "id")
     public List<DrinkHasMaterial> getDrinkList() {
         this.drinkList = (List<DrinkHasMaterial>) oneToMany();
         return this.drinkList;

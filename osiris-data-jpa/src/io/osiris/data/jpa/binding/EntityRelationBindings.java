@@ -37,6 +37,7 @@ public class EntityRelationBindings implements RelationBindings {
         return new EntityDataBindings(entityClass);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Optional<? extends Entity> manyToOne(Serializable entityId) {
         Optional<? extends Entity> entity = Optional.empty();
@@ -49,9 +50,11 @@ public class EntityRelationBindings implements RelationBindings {
 
             String table = entityDataBindings.table();
 
-            String query = "SELECT * " +
-                    "FROM " + manyToOneMap.get("referencedTable") + " " +
-                    "WHERE id = (SELECT " + manyToOneMap.get("column") + " FROM " + table + " WHERE id = ?)";
+            String query = "SELECT *" +
+                    " FROM " + manyToOneMap.get("table") +
+                    " WHERE " + manyToOneMap.get("target") +
+                    " = (SELECT DISTINCT " + manyToOneMap.get("column") +
+                    " FROM " + table + " WHERE " + manyToOneMap.get("column") + " = ?)";
 
             try (Connection connection = connectionAdapter.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
@@ -84,6 +87,7 @@ public class EntityRelationBindings implements RelationBindings {
         return entity;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<? extends Entity> oneToMany(Serializable entityId) {
         List<Entity> entityList = new ArrayList<>();
@@ -96,9 +100,11 @@ public class EntityRelationBindings implements RelationBindings {
 
             String table = entityDataBindings.table();
 
-            String query = "SELECT * " +
-                    "FROM " + oneToManyMap.get("value") + " " +
-                    "WHERE " + oneToManyMap.get("referenceColumn") + " = (SELECT id FROM " + table + " WHERE id = ?)";
+            String query = "SELECT *" +
+                    " FROM " + oneToManyMap.get("table") +
+                    " WHERE " + oneToManyMap.get("column") +
+                    " = (SELECT " + oneToManyMap.get("target") +
+                    " FROM " + table + " WHERE " + oneToManyMap.get("target") + " = ?)";
 
             try (Connection connection = connectionAdapter.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
