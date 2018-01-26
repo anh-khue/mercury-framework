@@ -4,7 +4,7 @@ import io.osiris.data.connection.ConnectionFactory;
 import io.osiris.data.jpa.Entity;
 import io.osiris.data.jpa.binding.EntityBindingsFactory;
 import io.osiris.data.jpa.binding.EntityDataBindings;
-import io.osiris.query.common.function.QueryFunction;
+import io.osiris.query.common.Builder;
 import io.osiris.query.tuple.*;
 
 import java.lang.reflect.Field;
@@ -12,10 +12,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.osiris.data.common.binding.DataBindingHandler.*;
+import static io.osiris.data.common.binding.function.DataBindingHandler.*;
 import static io.osiris.query.common.builder.QueryFunctionHandler.*;
 
 public abstract class QueryBuilder implements Builder {
@@ -224,37 +223,6 @@ public abstract class QueryBuilder implements Builder {
 }
 
 
-abstract class QueryComponent {
-
-    protected boolean called = false;
-    protected StringBuilder command;
-
-    protected String retrieve() {
-        return this.command == null ? "" : this.command.toString();
-    }
-}
-
-
-abstract class QueryCondition extends QueryComponent {
-
-    protected static final String AND = "AND ";
-    protected static final String OR = "OR ";
-
-    protected List<String> params = new ArrayList<>();
-
-    protected void process(ConcreteTuple tuple, String disjunction, String keyword) {
-        if (!this.called) this.command = new StringBuilder(keyword + " ");
-
-        if (disjunction != null) this.command.append(disjunction);
-
-        this.command.append(conditionHandler(tuple, this));
-        System.out.println(this.command.toString());
-        System.out.println(this.params);
-        this.called = true;
-    }
-}
-
-
 class Distinct extends QueryComponent {
 
 }
@@ -267,7 +235,7 @@ class From extends QueryComponent {
 
 class Where extends QueryCondition {
 
-    protected void process(ConcreteTuple tuple, String disjunction) {
+    protected void process(Tuple tuple, String disjunction) {
         super.process(tuple, disjunction, "WHERE");
     }
 }
@@ -285,7 +253,7 @@ class GroupBy extends QueryComponent {
 
 class Having extends QueryCondition {
 
-    protected void process(ConcreteTuple tuple, String disjunction) {
+    protected void process(Tuple tuple, String disjunction) {
         super.process(tuple, disjunction, "HAVING");
     }
 }
@@ -306,48 +274,4 @@ class Paging extends QueryComponent {
 
 class Join extends QueryComponent {
 
-}
-
-
-class QueryFunctionHandler {
-
-    static String conditionHandler(ConcreteTuple tuple, QueryCondition queryCondition) {
-        if (tuple instanceof Triplet) return tripletHandler.apply((Triplet) tuple, queryCondition);
-
-        if (tuple instanceof Quadruplet) return quadrupletHandler.apply((Quadruplet) tuple, queryCondition);
-
-        return null;
-    }
-
-    static Function<Pair, String> pairHandler =
-            pair -> String.valueOf(pair.objectAt(0)) + " " + String.valueOf(pair.objectAt(1));
-
-    private static QueryFunction<Triplet, String, QueryCondition> tripletHandler =
-            (triplet, queryCondition) -> {
-                StringBuilder builder = new StringBuilder("(");
-                for (int i = 0; i < triplet.size() - 1; i++) {
-                    builder.append(String.valueOf((triplet.objectAt(i))))
-                            .append(" ");
-                }
-                builder.append("?) ");
-
-                queryCondition.params.add(String.valueOf(triplet.objectAt(triplet.size() - 1)));
-
-                return builder.toString();
-            };
-
-    private static QueryFunction<Quadruplet, String, QueryCondition> quadrupletHandler =
-            (triplet, queryCondition) -> {
-                StringBuilder builder = new StringBuilder("(");
-                for (int i = 0; i < 2; i++) {
-                    builder.append(String.valueOf((triplet.objectAt(i))))
-                            .append(" ");
-                }
-                builder.append("? AND ?) ");
-
-                queryCondition.params.add(String.valueOf(triplet.objectAt(triplet.size() - 2)));
-                queryCondition.params.add(String.valueOf(triplet.objectAt(triplet.size() - 1)));
-
-                return builder.toString();
-            };
 }

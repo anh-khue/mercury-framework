@@ -1,4 +1,4 @@
-package io.osiris.query.common.builder;
+package io.osiris.query.common;
 
 import java.io.Serializable;
 

@@ -1,6 +1,5 @@
 package framework.builder.abstract_builder;
 
-import com.sun.istack.internal.Nullable;
 import framework.annotation.processor.ModelAnnotationProcessor;
 import framework.model_mapping.model.Model;
 import framework.model_mapping.model.ModelUtils;
@@ -147,7 +146,7 @@ public abstract class CommonQueryBuilder<T extends Model> implements QueryBuilde
     }
 
     @Override
-    public QueryBuilder whereBetween(String column, int[] values, @Nullable String combineType) {
+    public QueryBuilder whereBetween(String column, int[] values, String combineType) {
         if (where.toString().equals("")) {
             where.append("WHERE ");
         } else {
@@ -164,7 +163,7 @@ public abstract class CommonQueryBuilder<T extends Model> implements QueryBuilde
     }
 
     @Override
-    public QueryBuilder whereNotBetween(String column, int[] values, @Nullable String combineType) {
+    public QueryBuilder whereNotBetween(String column, int[] values, String combineType) {
         if (where.toString().equals("")) {
             where.append("WHERE ");
         } else {

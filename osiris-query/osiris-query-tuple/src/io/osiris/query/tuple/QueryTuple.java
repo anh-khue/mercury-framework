@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 public class QueryTuple implements Tuple {
 
-    protected List<Object> values;
+    private List<Object> values;
 
     QueryTuple(Object... values) {
         Class<?>[] types = Stream.of(values)
