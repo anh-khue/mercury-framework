@@ -17,7 +17,7 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.osiris.data.common.binding.DataBindingHandler.setFields;
+import static io.osiris.data.common.binding.function.DataBindingHandler.setFields;
 
 public abstract class CrudRepository<T extends Entity, R extends Serializable> implements JpaRepository {
 

@@ -6,5 +6,7 @@ import java.sql.SQLException;
 
 public interface ConnectionAdapter extends Serializable {
 
+    String databaseName();
+
     Connection openConnection() throws ClassNotFoundException, SQLException;
 }

@@ -1,9 +1,10 @@
 @file:JvmName("DataBindingHandler")
 
-package io.osiris.data.orm.handler
+package io.osiris.data.common.binding.function
 
+import io.osiris.data.common.annotation.Column
+import io.osiris.data.common.annotation.Id
 import io.osiris.data.common.dto.DTO
-import com.osiris.data.orm.annotation.Column
 import java.lang.reflect.Field
 import java.sql.ResultSet
 import java.sql.SQLException
@@ -11,15 +12,14 @@ import java.sql.Timestamp
 import java.util.Arrays
 import kotlin.collections.ArrayList
 
-@Deprecated("Going to remove ORM module")
-fun fetchColumns(entityClass: Class<*>): List<String> {
+fun fetchColumns(dtoClass: Class<*>): List<String> {
     val columns = ArrayList<String>()
     
-    if (entityClass.superclass != null) {
-        columns.addAll(fetchColumns(entityClass.superclass))
+    if (dtoClass.superclass != null) {
+        columns.addAll(fetchColumns(dtoClass.superclass))
     }
     
-    entityClass.declaredFields
+    dtoClass.declaredFields
             .asSequence()
             .mapNotNull { it.getAnnotation(Column::class.java) }
             .mapTo(columns) { it.value }
@@ -27,23 +27,30 @@ fun fetchColumns(entityClass: Class<*>): List<String> {
     return columns
 }
 
-@Deprecated("Going to remove ORM module")
-fun fetchFields(entityClass: Class<*>): List<Field> {
+fun fetchFields(dtoClass: Class<*>): List<Field> {
     val fieldList = ArrayList<Field>()
     
-    if (entityClass.superclass != null) {
-        fieldList.addAll(fetchFields(entityClass.superclass))
+    if (dtoClass.superclass != null) {
+        fieldList.addAll(fetchFields(dtoClass.superclass))
     }
     
-    val modelFieldArray = entityClass.declaredFields
+    val modelFieldArray = dtoClass.declaredFields
     fieldList.addAll(Arrays.asList(*modelFieldArray))
     
     return fieldList
 }
 
-@Deprecated("Going to remove ORM module")
+fun fetchIds(dtoClass: Class<*>, dto: DTO): List<Any?> {
+    
+    return dtoClass.declaredFields
+            .asSequence()
+            .filter({ it.getAnnotation(Id::class.java) != null })
+            .map({ it.isAccessible = true; it.get(dto) })
+            .toList<Any?>()
+}
+
 @Throws(SQLException::class, IllegalAccessException::class)
-fun setFields(dto: DTO, fieldList: List<Field>, resultSet: ResultSet) {
+fun setFields(dto: Any, fieldList: List<Field>, resultSet: ResultSet) {
     for (field in fieldList) {
         val column: Column? = field.getAnnotation(Column::class.java)
         if (column != null) {
@@ -53,6 +60,8 @@ fun setFields(dto: DTO, fieldList: List<Field>, resultSet: ResultSet) {
             value = try {
                 if (fieldType == Int::class.javaPrimitiveType || fieldType == Int::class.java) {
                     resultSet.getInt(column.value)
+                } else if (fieldType == Long::class.javaPrimitiveType || fieldType == Long::class.java) {
+                    resultSet.getLong(column.value)
                 } else if (fieldType == Boolean::class.javaPrimitiveType || fieldType == Boolean::class.java) {
                     resultSet.getBoolean(column.value)
                 } else if (fieldType == Timestamp::class.java) {

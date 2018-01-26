@@ -8,24 +8,19 @@ import java.io.FileNotFoundException
 import javax.xml.parsers.DocumentBuilderFactory
 
 object XmlReader : ConnectionReader {
-    override fun getDriverClass(): String {
-        return getPropertyFromNode("driver") ?: fail()
-    }
-
-    override fun getUrl(): String {
-        return getPropertyFromNode("url") ?: fail()
-    }
-
-    override fun getUsername(): String {
-        return getPropertyFromNode("username") ?: fail()
-    }
-
-    override fun getPassword(): String {
-        return getPropertyFromNode("password") ?: fail()
-    }
+    override fun getName(): String = getPropertyFromNode("name") ?: fail()
+    
+    override fun getDriverClass(): String = getPropertyFromNode("driver") ?: fail()
+    
+    override fun getUrl(): String = getPropertyFromNode("url") ?: fail()
+    
+    override fun getUsername(): String = getPropertyFromNode("username") ?: fail()
+    
+    override fun getPassword(): String = getPropertyFromNode("password") ?: fail()
 }
 
 private val xmlFile: File? = try {
+    val url = ClassLoader.getSystemResource("resources/connection.properties")
     File(ClassLoader.getSystemResource("resources/connection.xml").file)
 } catch (e: FileNotFoundException) {
     null
@@ -36,7 +31,7 @@ private val xmlNode: Node? = try {
             .newDocumentBuilder()
             .parse(xmlFile)
     document.documentElement.normalize()
-
+    
     document.getElementsByTagName("connection").item(0)
 } catch (e: Exception) {
     null

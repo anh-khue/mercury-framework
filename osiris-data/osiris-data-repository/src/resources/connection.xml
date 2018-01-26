@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <connection>
-    <dbms>MySQL</dbms>
+    <name>MySQL</name>
     <driver>com.mysql.jdbc.Driver</driver>
     <url>jdbc:mysql://0.0.0.0:3306/osiris_test_db</url>
     <username>osiris-master</username>

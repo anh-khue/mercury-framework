@@ -12,7 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.osiris.data.common.binding.DataBindingHandler.*;
+import static io.osiris.data.common.binding.function.DataBindingHandler.fetchColumns;
+import static io.osiris.data.common.binding.function.DataBindingHandler.fetchFields;
 
 public class EntityDataBindings implements DataBindings {
 

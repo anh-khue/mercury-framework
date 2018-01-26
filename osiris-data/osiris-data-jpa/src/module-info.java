@@ -1,6 +1,7 @@
 module osiris.data.jpa {
-    requires transitive osiris.data.common;
-    requires transitive osiris.data.connection;
+    requires osiris.data.common;
+    requires osiris.data.connection;
+    requires java.sql;
 
     exports io.osiris.data.jpa.binding to osiris.data.repository, osiris.query.common;
     exports io.osiris.data.jpa;

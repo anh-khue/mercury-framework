@@ -1,9 +1,9 @@
 package io.osiris.data.jpa.binding;
 
-import io.osiris.data.common.binding.DTOBindingsFactory;
+import io.osiris.data.common.binding.DtoBindingsFactory;
 import io.osiris.data.jpa.Entity;
 
-public class EntityBindingsFactory implements DTOBindingsFactory {
+public class EntityBindingsFactory implements DtoBindingsFactory {
 
     private final Class<? extends Entity> entityClass;
 

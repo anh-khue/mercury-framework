@@ -1,6 +1,6 @@
 package io.osiris.data.jpa;
 
-import io.osiris.data.common.binding.DataBindingHandler;
+import io.osiris.data.common.binding.function.DataBindingHandler;
 import io.osiris.data.jpa.binding.EntityBindingsFactory;
 import io.osiris.data.jpa.binding.EntityDataBindings;
 import io.osiris.data.jpa.binding.EntityRelationBindings;

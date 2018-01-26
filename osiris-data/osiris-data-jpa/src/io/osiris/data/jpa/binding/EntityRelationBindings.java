@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.osiris.data.common.binding.DataBindingHandler.setFields;
-import static io.osiris.data.common.binding.RelationBindingHandler.fetchManyToOne;
-import static io.osiris.data.common.binding.RelationBindingHandler.fetchOneToMany;
+import static io.osiris.data.common.binding.function.DataBindingHandler.setFields;
+import static io.osiris.data.common.binding.function.RelationBindingHandler.fetchManyToOne;
+import static io.osiris.data.common.binding.function.RelationBindingHandler.fetchOneToMany;
 
 public class EntityRelationBindings implements RelationBindings {
 
