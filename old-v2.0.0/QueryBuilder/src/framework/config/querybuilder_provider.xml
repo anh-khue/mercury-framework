@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<QueryBuilderImplementations>
+    <implementation>
+        <dbms-name>MS-SQLServer</dbms-name>
+        <class-name>framework.builder.querybuilder.SQLServerQueryBuilder</class-name>
+    </implementation>
+    <implementation>
+        <dbms-name>MySQL</dbms-name>
+        <class-name>framework.builder.querybuilder.MySQLQueryBuilder</class-name>
+    </implementation>
+</QueryBuilderImplementations>
