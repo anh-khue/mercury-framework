@@ -14,7 +14,6 @@ class ConnectionFactory : ConnectionAdapter {
     
     override fun databaseName(): String {
         val file = File("resources/connection.properties")
-        println(file.absolutePath)
         return if (file.exists()) {
             PropertiesReader.name
         } else {
@@ -26,7 +25,6 @@ class ConnectionFactory : ConnectionAdapter {
     override fun openConnection(): Connection {
         
         val file = File("resources/connection.properties")
-        println(file.absolutePath)
         return if (file.exists()) {
             PropertiesConnection.openConnection()
         } else {
