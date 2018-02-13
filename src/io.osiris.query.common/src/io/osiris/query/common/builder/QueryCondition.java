@@ -20,8 +20,6 @@ abstract class QueryCondition extends QueryComponent {
         if (disjunction != null) this.command.append(disjunction);
 
         this.command.append(conditionHandler(tuple, this));
-        System.out.println(this.command.toString());
-        System.out.println(this.params);
         this.called = true;
     }
 }

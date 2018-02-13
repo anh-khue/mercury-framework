@@ -10,7 +10,7 @@ public interface RelationBindings extends Serializable {
 
     DataBindings dataBindings();
 
-    Optional<? extends DTO> manyToOne(Serializable entityId);
+    Optional<? extends DTO> manyToOne(List<Serializable> entityId);
 
     List<? extends DTO> oneToMany(Serializable entityId);
 }

@@ -5,9 +5,9 @@ import io.osiris.data.common.dto.DTO;
 import java.util.List;
 import java.util.Optional;
 
-public interface JpaDTO extends DTO {
+public abstract class JpaDTO implements DTO {
 
-    Optional<? extends JpaDTO> manyToOne();
+    protected abstract Optional<? extends JpaDTO> manyToOne();
 
-    List<? extends JpaDTO> oneToMany();
+    protected abstract List<? extends JpaDTO> oneToMany();
 }

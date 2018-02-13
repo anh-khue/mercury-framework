@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static io.osiris.data.common.binding.function.DataBindingHandler.setFields;
 import static io.osiris.data.common.binding.function.RelationBindingHandler.fetchManyToOne;
@@ -39,8 +40,9 @@ public class EntityRelationBindings implements RelationBindings {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Optional<? extends Entity> manyToOne(Serializable entityId) {
+    public Optional<? extends Entity> manyToOne(List<Serializable> ids) {
         Optional<? extends Entity> entity = Optional.empty();
+        List<String> idColumns = entityDataBindings.idColumns();
 
         try {
             String methodName = Thread.currentThread().getStackTrace()[3].getMethodName();
@@ -54,15 +56,18 @@ public class EntityRelationBindings implements RelationBindings {
                     " FROM " + manyToOneMap.get("table") +
                     " WHERE " + manyToOneMap.get("target") +
                     " = (SELECT DISTINCT " + manyToOneMap.get("column") +
-                    " FROM " + table + " WHERE " + manyToOneMap.get("column") + " = ?)";
+                    " FROM " + table + " WHERE " + idColumns.stream()
+                    .map(idColumn -> idColumn + " = ?")
+                    .collect(Collectors.joining(" AND ")) + ")";
 
             try (Connection connection = connectionAdapter.openConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
-
-                if (entityId instanceof Integer) {
-                    statement.setInt(1, (Integer) entityId);
-                } else {
-                    statement.setLong(1, (Long) entityId);
+                for (int i = 0; i < ids.size(); i++) {
+                    if (ids.get(i) instanceof Integer) {
+                        statement.setInt((i + 1), (Integer) ids.get(i));
+                    } else {
+                        statement.setLong((i + 1), (Long) ids.get(i));
+                    }
                 }
 
                 ResultSet resultSet = statement.executeQuery();

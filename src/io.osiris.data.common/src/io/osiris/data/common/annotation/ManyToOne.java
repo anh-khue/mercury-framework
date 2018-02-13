@@ -7,9 +7,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ManyToOne {
 
-    String column() default "";
+    String target() default "";
 
     String table() default "";
 
-    String target() default "";
+    String column() default "";
 }

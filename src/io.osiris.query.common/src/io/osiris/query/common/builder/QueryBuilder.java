@@ -25,21 +25,20 @@ import static io.osiris.query.common.builder.QueryFunctionHandler.pairHandler;
 public abstract class QueryBuilder implements Builder {
 
     protected StringBuilder query;
-    protected List<String> params = new ArrayList<>();
+    List<String> params = new ArrayList<>();
 
-    protected Class<? extends Entity> entityClass;
+    private Class<? extends Entity> entityClass;
 
-    protected StringBuilder columns = new StringBuilder("");
-
-    protected Distinct distinct = new Distinct();
-    protected From from = new From();
-    protected Where where = new Where();
-    protected OrderBy orderBy = new OrderBy();
-    protected GroupBy groupBy = new GroupBy();
-    protected Having having = new Having();
-    protected Paging paging = new Paging();
-    protected Limit limit = new Limit();
-    protected Join join = new Join();
+    StringBuilder columns = new StringBuilder("");
+    Distinct distinct = new Distinct();
+    From from = new From();
+    Where where = new Where();
+    OrderBy orderBy = new OrderBy();
+    GroupBy groupBy = new GroupBy();
+    Having having = new Having();
+    Paging paging = new Paging();
+    Limit limit = new Limit();
+    Join join = new Join();
 
     public QueryBuilder from(Class<? extends Entity> entityClass) {
 
@@ -59,6 +58,24 @@ public abstract class QueryBuilder implements Builder {
         this.from.command = new StringBuilder("FROM " + entityDataBindings.table() + " ");
 
         this.from.called = true;
+        return this;
+    }
+
+    public QueryBuilder as(String as) {
+        if (!this.from.called) return this;
+
+        columns = new StringBuilder("")
+                .append(
+                        fetchColumns(entityClass)
+                                .stream()
+                                .map(column -> as + "." + column)
+                                .collect(Collectors.joining(",")))
+                .append(" ");
+        this.from.command
+                .append("AS ")
+                .append(as)
+                .append(" ");
+
         return this;
     }
 
@@ -107,7 +124,6 @@ public abstract class QueryBuilder implements Builder {
                         .map(pairHandler::apply)
                         .collect(Collectors.joining(", ")));
         this.orderBy.command.append(" ");
-        System.out.println(this.orderBy.command.toString());
         this.orderBy.called = true;
         return this;
     }
@@ -120,7 +136,6 @@ public abstract class QueryBuilder implements Builder {
                 Arrays.stream(columns)
                         .collect(Collectors.joining(", ")))
                 .append(" ");
-        System.out.println(this.groupBy.command);
         this.groupBy.called = true;
         return this;
     }
@@ -159,7 +174,20 @@ public abstract class QueryBuilder implements Builder {
 
     abstract public QueryBuilder paging(int itemPerPage, int page);
 
-    abstract public QueryBuilder join(String table, String as, Triplet onTriplet);
+    public QueryBuilder join(String table, String as, Triplet onTriplet) {
+        if (!this.join.called) this.join.command = new StringBuilder("");
+
+        this.join.command
+                .append("JOIN ")
+                .append(table).append(" AS ").append(as)
+                .append(" ON ")
+                .append(String.valueOf(onTriplet.objectAt(0)))
+                .append(String.valueOf(onTriplet.objectAt(1)))
+                .append(String.valueOf(onTriplet.objectAt(2)))
+                .append(" ");
+        this.join.called = true;
+        return this;
+    }
 
     public List<? extends Entity> getResultList() {
         this.build();
@@ -171,8 +199,6 @@ public abstract class QueryBuilder implements Builder {
 
         try (Connection connection = connectionFactory.openConnection();
              PreparedStatement statement = connection.prepareStatement(this.query.toString())) {
-
-            System.out.println(query.toString());
 
             for (int i = 0; i < this.params.size(); i++) {
                 statement.setString((i + 1), params.get(i));
@@ -202,8 +228,6 @@ public abstract class QueryBuilder implements Builder {
 
         try (Connection connection = connectionFactory.openConnection();
              PreparedStatement statement = connection.prepareStatement(this.query.toString())) {
-
-            System.out.println(query.toString());
 
             for (int i = 0; i < this.params.size(); i++) {
                 statement.setString((i + 1), params.get(i));
