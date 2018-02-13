@@ -8,6 +8,7 @@ import io.osiris.data.common.binding.DataBindings;
 import io.osiris.data.jpa.Entity;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,22 +31,44 @@ public class EntityDataBindings implements DataBindings {
 
     @Override
     public List<String> idColumns() {
-        Field[] fields = entityClass.getDeclaredFields();
+        List<String> ids = new ArrayList<>();
 
-        return Arrays.stream(fields)
+        if (entityClass.getSuperclass() != null) {
+            EntityDataBindings superClassBinding =
+                    new EntityDataBindings((Class<? extends Entity>) entityClass.getSuperclass());
+            ids.addAll(superClassBinding.idColumns());
+        }
+
+        Field[] fields = entityClass.getDeclaredFields();
+        List<Field> idList = Arrays.stream(fields)
                 .filter(field -> field.getAnnotation(Id.class) != null)
-                .map(field -> field.getAnnotation(Column.class).value())
                 .collect(Collectors.toList());
+
+        ids.addAll(idList.stream().map(field -> field.getAnnotation(Column.class).value())
+                .collect(Collectors.toList()));
+
+        return ids;
     }
 
     @Override
     public List<String> generatedColumns() {
-        Field[] fields = entityClass.getDeclaredFields();
+        List<String> generatedColumns = new ArrayList<>();
 
-        return Arrays.stream(fields)
+        if (entityClass.getSuperclass() != null) {
+            EntityDataBindings superClassBinding =
+                    new EntityDataBindings((Class<? extends Entity>) entityClass.getSuperclass());
+            generatedColumns.addAll(superClassBinding.generatedColumns());
+        }
+
+        Field[] fields = entityClass.getDeclaredFields();
+        List<Field> generatedList = Arrays.stream(fields)
                 .filter(field -> field.getAnnotation(Generated.class) != null)
-                .map(field -> field.getAnnotation(Column.class).value())
                 .collect(Collectors.toList());
+
+        generatedColumns.addAll(generatedList.stream().map(field -> field.getAnnotation(Column.class).value())
+                .collect(Collectors.toList()));
+
+        return generatedColumns;
     }
 
     @Override

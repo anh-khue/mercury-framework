@@ -1,15 +1,12 @@
 package io.osiris.query.common.builder;
 
-import io.osiris.query.tuple.Triplet;
-
 public class MySqlBuilder extends QueryBuilder {
 
     @Override
     public QueryBuilder limit(int limit) {
         if (this.limit.called) return this;
 
-        this.limit.command = new StringBuilder("LIMIT ? ");
-        this.limit.maxResult = limit;
+        this.limit.command = new StringBuilder("LIMIT ").append(limit).append(" ");
 
         this.limit.called = true;
         return this;
@@ -20,16 +17,11 @@ public class MySqlBuilder extends QueryBuilder {
         if (this.paging.called) return this;
 
         this.paging.command = new StringBuilder("LIMIT ? OFFSET ? ");
-        this.paging.itemPerPage = itemPerPage;
-        this.paging.page = (page - 1) * itemPerPage;
+        this.paging.command = new StringBuilder("LIMIT ").append(itemPerPage)
+                .append(" OFFSET ").append((page - 1) * itemPerPage);
 
         this.paging.called = true;
         return this;
-    }
-
-    @Override
-    public QueryBuilder join(String table, String as, Triplet onTriplet) {
-        return null;
     }
 
     @Override
@@ -50,13 +42,6 @@ public class MySqlBuilder extends QueryBuilder {
 
         this.params.addAll(this.where.params);
         this.params.addAll(this.having.params);
-
-        if (this.limit.called) this.params.add(String.valueOf(this.limit.maxResult));
-
-        if (this.paging.called) {
-            this.params.add(String.valueOf(this.paging.itemPerPage));
-            this.params.add(String.valueOf(this.paging.page));
-        }
 
         return this;
     }

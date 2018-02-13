@@ -42,11 +42,19 @@ fun fetchFields(dtoClass: Class<*>): List<Field> {
 
 fun fetchIds(dtoClass: Class<*>, dto: DTO): List<Any?> {
     
-    return dtoClass.declaredFields
+    val idList = ArrayList<Any?>()
+    
+    if (dtoClass.superclass != null) {
+        idList.addAll(fetchIds(dtoClass.superclass, dto))
+    }
+    
+    idList.addAll(dtoClass.declaredFields
             .asSequence()
             .filter({ it.getAnnotation(Id::class.java) != null })
             .map({ it.isAccessible = true; it.get(dto) })
-            .toList<Any?>()
+            .toList<Any?>())
+    
+    return idList
 }
 
 @Throws(SQLException::class, IllegalAccessException::class)
@@ -58,7 +66,7 @@ fun setFields(dto: Any, fieldList: List<Field>, resultSet: ResultSet) {
             val value: Any?
             val fieldType = field.type
             value = try {
-                if (fieldType == Int::class.javaPrimitiveType || fieldType == Int::class.java) {
+                if (fieldType == Int::class.javaPrimitiveType || fieldType == Integer::class.java) {
                     resultSet.getInt(column.value)
                 } else if (fieldType == Long::class.javaPrimitiveType || fieldType == Long::class.java) {
                     resultSet.getLong(column.value)

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class Entity implements JpaDTO {
+public abstract class Entity extends JpaDTO {
 
     private final EntityRelationBindings relationBindings;
     private final List<String> idColumns;
@@ -36,12 +36,14 @@ public abstract class Entity implements JpaDTO {
     }
 
     @SuppressWarnings("unchecked")
-    public Optional<? extends Entity> manyToOne() {
+    @Override
+    protected Optional<? extends Entity> manyToOne() {
         List idValues = DataBindingHandler.fetchIds(this.getClass(), this);
         return relationBindings.manyToOne(idValues);
     }
 
-    public List<? extends Entity> oneToMany() {
+    @Override
+    protected List<? extends Entity> oneToMany() {
         List idValues = DataBindingHandler.fetchIds(this.getClass(), this);
         return relationBindings.oneToMany((Serializable) idValues.get(0));
     }
